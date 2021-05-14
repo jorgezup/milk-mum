@@ -1,0 +1,185 @@
+.container {
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  flex: 1;
+
+  .header {
+    display: flex;
+
+    h2 {
+      font-size: 2rem;
+      font-weight: normal;
+      margin-right: auto;
+    }
+  }
+
+}
+
+.content {
+  margin-top: 2rem;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: center;
+
+  @media (max-width: 625px) {
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  }
+
+  label {
+    margin: .5rem 0;
+    display: block;
+  }
+
+  .disabled {
+    span {
+      color: var(--gray-500);
+      padding: 0 0.75rem;
+    }
+  }
+
+  img {
+    border-radius: 16px;
+  }
+}
+
+.buttons {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+
+  gap: 1.25rem;
+
+  a {
+    text-align: center;
+  }
+  
+
+  button,  a{
+    display: grid;
+    grid-template-columns: 20px .3fr 1fr;
+    align-items: center;
+
+    width: 100%;
+
+    padding: 0 1rem;
+
+    height: 3rem;
+    border-radius: 8px;
+    border: 0;
+    font-weight: 700;
+    color: var(--gray-100);
+    transition: filter .2s;
+
+    &:hover {
+      filter: brightness(.82);
+    }
+
+    span {
+      font-size: 1.5rem;
+      line-height: 1.5rem;
+      font-weight: 300;
+      justify-self: center;
+    }
+
+    svg {
+      width: 1.2rem;
+      height: 1.2rem;
+
+      line-height: 1.2rem;
+    }
+
+  }
+  .delete {
+    background: var(--red-700);
+  }
+
+  .milking {
+    background: var(--blue-500);
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  .weight {
+    background: var(--yellow-500);
+  }
+
+  .edit {
+    background: var(--green-700);
+  }
+
+  .coverage {
+    background: #89729e;
+  }
+
+  .born {
+    background: #9bc4e2;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+}
+
+.tableContainer {
+  width: 100%;
+  margin: 0 auto;
+
+  overflow-x: auto;
+
+
+  flex: 1;
+
+  table {
+    width: 100%;
+    border-spacing: 0 0.5rem;
+
+    th {
+      color: var(--gray-900);
+      font-weight: 700;
+      padding: 1rem 2rem;
+      text-align: left;
+      line-height: 1.5rem;
+    }
+
+
+
+    tbody {
+      tr {
+        background: rgba(0, 0, 0, 0.03);
+        cursor: pointer;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.09);
+        }
+
+        td {
+          padding: 1rem 2rem;
+          border: 0;
+          color: var(--gray-800);
+    
+          &:last-of-type {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+    
+            a {
+              svg {
+                width: 1.2rem;
+                height: 1.2rem;
+              }
+            }
+          }
+        }
+      }
+    }
+  }  
+}

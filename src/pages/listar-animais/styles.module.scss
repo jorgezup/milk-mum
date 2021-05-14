@@ -1,0 +1,61 @@
+.container {
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  flex: 1;
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+    border-spacing: 0 0.5rem;
+
+    th {
+      color: var(--gray-900);
+      font-weight: 700;
+      padding: 1rem 2rem;
+      // text-align: left;
+      line-height: 1.5rem;
+    }
+
+
+
+    tbody {
+      tr {
+        background: rgba(0, 0, 0, 0.03);
+        cursor: pointer;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.09);
+        }
+
+        td {
+          padding: 1rem;
+          border: 0;
+          color: var(--gray-800);
+          text-align: center;
+   
+          &:last-of-type {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+    
+            a {
+              svg {
+                width: 1.2rem;
+                height: 1.2rem;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .alert {
+    color: var(--red-700);
+    font-weight: 600;
+  }
+
+}
