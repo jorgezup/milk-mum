@@ -1,28 +1,21 @@
 .navbar {
-  max-width: 1120px;
-  height: 5rem;
+  // max-width: 1120px;
+  // height: 5rem;
   // margin: 0 auto;
   
     
   .wrapper {
     display: flex;
-    justify-content: center;
-    align-items: center;
     
-    // margin-left: 5rem;
-
-
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    
 
     height: 5rem;
 
-    img {
-      // margin-right: 2rem;
-      width: auto;
-      height: 100%;
-    }
-
     @media (max-width: 768px) {
-      justify-content: initial;
+      justify-content: space-between;
     }
   }
 

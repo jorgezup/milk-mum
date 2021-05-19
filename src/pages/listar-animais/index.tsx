@@ -1,101 +1,112 @@
 import moment from 'moment'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
+import { GiCow } from 'react-icons/gi'
 import { api } from '../../services/api'
 import styles from './styles.module.scss'
 
-interface Weight {
+type IWeight = {
   id: number;
   weight: number;
+  date: Date;
 }
 
-interface CowProps {
+type IMilking = {
+  id: number,
+  firstMilking: number,
+  secondMilking: number,
+  total: number,
+  date: Date,
+  formattedDate: string
+}
+
+
+type ICow = {
   id: number;
   name: string;
-  weight: number;
-  born: string;
-  childBirth: string;
-  age: number;
-  pesos: Array<Weight>;
-  lactation: number;
-  stopLactation: number;
-  dry: number;
+  milkings: IMilking[];
+  weights: IWeight[];
 }
 
-type CowPropsId = Pick<CowProps, "id">
 
 export default function AnimalList() {
-  const [cows, setCows] = useState<CowProps[]>([])
+  const [cows, setCows] = useState<ICow[]>([])
 
   useEffect(() => {
     async function getCows() {
       const response = await api.get('vacas')
-
-      const data = response.data.map((item: CowProps) => {
-        const lactationPeriod = 305 //dias
-        const lactationPeriodMoreOneDay = lactationPeriod + 1  //dias
-
+      const cowData = response.data.map((cow: ICow) => {
         return {
-          ...item,
-          weight: item.pesos.sort((a, b) => (a.id > b.id) ? -1 : 1)[0]?.weight,
-          age: moment(Date.now()).diff(item.born, 'months'),
-          // lactation: moment(Date.now()).diff(item.childBirth, 'days'),
-          // stopLactation: lactationPeriod -  moment(Date.now()).diff(item.childBirth, 'days'),
-          // dry: moment(moment(item.childBirth).add(lactationPeriodMoreOneDay, 'days')).format('DD/MM/YYYY'),
+          ...cow,
+          weights: cow?.weights?.sort((a:IWeight, b:IWeight) => (a.id > b.id) ? -1 : 1),
+          milkings: cow?.milkings?.sort((a:IMilking, b:IMilking) => (a.id > b.id) ? -1 : 1),
         }
       })
-      setCows(data)
+      setCows(cowData)
     }
     getCows()
   }, [])
 
   return (
     <div className={styles.container}>
+      <header>
+        <Link href="/cadastrar-animal">
+          <button title="Cadastrar Vaca">
+            <span>Cadastrar Vaca</span>
+            <span>|</span>
+            <GiCow />
+          </button>
+        </Link>
+      </header>
       <table>
         <thead>
           <tr>
             <th>Nome</th>
             <th>Peso</th>
-            <th>Lactação restante</th>
-            <th>Secar</th>
+            <th>1a ordenha</th>
+            <th>2a ordenha</th>
+            <th>Data</th>
           </tr>
         </thead>
         <tbody>
-          {cows.map(cow => (
-            <Link 
-             key={cow.id} 
+          {cows.map((cow) => (
+            <Link
+              key={cow.id}
               href={`visualizar-animal/${cow.id}`}
             >
-            <tr 
-              key={cow.id} 
-              // onClick={() => handleViewCow(cow)}
-              title="Visualizar animal"
-            >
-              <td>{cow.name}</td>
-              {
-                cow.weight 
-                ? <td>{cow.weight}kg</td>
-                : <td></td>
-              }
-              <td className={cow.stopLactation < 10 ? styles.alert : ''}>
-              { cow.stopLactation >= 0 
-                ? `${cow.stopLactation} dias` 
-                : ''
-              } 
-              </td>
-              <td>
+              <tr
+                key={cow.id}
+                // onClick={() => handleViewCow(cow)}
+                title="Visualizar animal"
+              >
+                <td>{cow?.name}</td>
                 {
-                  cow.stopLactation <= 10 && cow.stopLactation >= -1
-                  ? cow.dry
-                  : ''
+                  cow.weights?.[0]?.weight
+                    ? <td>{cow.weights?.[0]?.weight} kg</td>
+                    : <td></td>
                 }
-              </td>
-            </tr>
+                {
+                    cow.milkings[0]?.firstMilking
+                    ? <td>{(cow.milkings?.[0]?.firstMilking).toLocaleString('pt-BR')} kg</td>
+                    : <td></td>
+                }
+                {
+                    cow.milkings[0]?.secondMilking
+                    ? <td>{(cow.milkings?.[0]?.secondMilking).toLocaleString('pt-BR')} kg</td>
+                    : <td></td>
+                }
+                <td>
+                  {
+                    cow.milkings?.[0]
+                      ? moment(cow.milkings?.[0].date).format('DD/MM/YYYY')
+                      : moment(cow.weights?.[0].date).format('DD/MM/YYYY')
+                  }
+                </td>
+              </tr>
             </Link>
           ))}
         </tbody>
       </table>
-
     </div>
   )
 }

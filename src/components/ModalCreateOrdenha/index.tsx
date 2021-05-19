@@ -4,32 +4,44 @@ import router from "next/router"
 import React from "react"
 import { FiX } from 'react-icons/fi'
 import { toast } from "react-toastify"
+import * as Yup from 'yup'
 import Modal from "../../Modal"
 import { api } from "../../services/api"
 import styles from './styles.module.scss'
 
+
+const OrdenhaSchema = Yup.object().shape({
+  firstMilking: Yup.string().required('Se não houve retirada, inserir o valor 0.'),
+  secondMilking: Yup.string().required('Se não houve retirada, inserir o valor 0.'),
+  date: Yup.date().required('Data é obrigatória')
+})
+
 const ModalCreateOrdenha = ({ isOpen, setIsOpen, creatingMilking }) => {
   async function onSubmit (values) {
-    const data = {
-      vacaId: creatingMilking.id,
-      firstMilking: values.firstMilking,
-      secondMilking: values.secondMilking,
-      date: moment(values.date).format()
-    }
+    try {
+      const data = {
+        vacaId: creatingMilking.id,
+        firstMilking: values.firstMilking,
+        secondMilking: values.secondMilking,
+        date: moment(values.date).format()
+      }
+  
+      const response = await api.post(`ordenhas`, data)
+  
+      if (response.status === 200) {
+        toast.success('Cadastrado com sucesso')
+        router.push(`/visualizar-animal/${creatingMilking.id}`)
+        setIsOpen(false)
+      }
 
-    const response = await api.post(`ordenhas`, data)
-
-    if (response.status === 200) {
-      toast.success('Cadastrado com sucesso')
-      router.push(`/visualizar-animal/${creatingMilking.id}`)
-      setIsOpen(false)
-    }
-    else {
-      toast.error('Erro ao cadastrar.')
+    } catch (error) {
+      console.error(error)
+      toast.error('Erro inesperado.')
+      router.push(`/`)
     }
   }
 
-  function handleCancel() {
+  function handleCloseModal() {
     setIsOpen(false)
   }
 
@@ -39,17 +51,18 @@ const ModalCreateOrdenha = ({ isOpen, setIsOpen, creatingMilking }) => {
         <header className={styles.header}>
           <h2>Registrar Ordenha</h2>
           <button type="button" title="Fechar">
-            <FiX onClick={handleCancel}/>
+            <FiX onClick={handleCloseModal}/>
           </button>
         </header>
 
         <Formik 
-          onSubmit={onSubmit}
           initialValues={{
             firstMilking: '',
             secondMilking: '',
             date: moment().format('YYYY-MM-DD'),
           }}
+          validationSchema={OrdenhaSchema}
+          onSubmit={onSubmit}
         >
           {({ values, errors, touched }) => (
             <Form className={styles.form}>

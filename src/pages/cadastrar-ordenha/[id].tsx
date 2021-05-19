@@ -185,8 +185,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     id,
     name: response.data.name,
   }
-  console.log(data)
-
+  
   return {
     props: {
       data,
