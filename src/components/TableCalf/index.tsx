@@ -44,7 +44,7 @@ const TableCalf = ({ cow }) => {
               return (
                 <tr key={coverage.cria.id}>
                   <td>{coverage.cria.name}</td>
-                  <td>{moment(coverage.cria?.birthDate).format('DD/MM/YYYY')}</td>
+                  <td>{moment(coverage.cria?.birthDate).format('DD/MM/YYYY')}l</td>
                   <td
                     onClick={() => handleEditCalf(coverage.cria)} 
                     title="Editar Cria"

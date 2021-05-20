@@ -24,7 +24,7 @@ export default function AnimalRegister() {
 
     const uploadRes = await axios({
       method: 'POST',
-      url: 'http://localhost:1337/upload',
+      url: `${process.env.API_URL}/upload`,
       data: uploadData
     })
 

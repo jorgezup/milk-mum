@@ -232,7 +232,7 @@ export default function AnimalRegister({ cow }: CowProps) {
           {
             cow.image &&
             <Image
-              src={`http://localhost:1337${cow.image}`}
+              src={`${process.env.NEXT_PUBLIC_API_URL}${cow.image}`}
               alt={cow.name}
               layout="fill"
               objectFit="cover"
@@ -276,7 +276,7 @@ export default function AnimalRegister({ cow }: CowProps) {
         </button>
 
         {
-          ((cow.coverages.length > 1) || (cow.coverages?.[0].cria !== null)) &&
+          ((cow.coverages.length > 1) || (cow.coverages?.[0]?.cria !== undefined)) &&
           <button
             type="button"
             className={styles.born}

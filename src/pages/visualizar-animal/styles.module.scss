@@ -12,15 +12,14 @@
     .title {
       display: flex;
       margin-right: auto;
-      // align-items: center;
-      // line-height: 2rem;
+      align-items: center;
+      line-height: 2rem;
       h2 {
         font-size: 2rem;
         font-weight: normal;
         margin-right: .25rem;
       }
       a {
-        margin-bottom: .2rem;
         align-self: flex-end;
         color: var(--orange);
       }

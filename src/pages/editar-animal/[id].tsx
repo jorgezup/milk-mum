@@ -54,7 +54,7 @@ export default function AnimalEdit({ cow }: CowProps) {
 
     const uploadRes = await axios({
       method: 'POST',
-      url: 'http://localhost:1337/upload',
+      url: `${process.env.API_URL}/upload`,
       data: uploadData
     })
 
@@ -156,7 +156,7 @@ export default function AnimalEdit({ cow }: CowProps) {
             {
               cow.image && cow.image !== null &&
               <Image 
-                src={`http://localhost:1337${cow.image}`} 
+                src={`${process.env.NEXT_PUBLIC_API_URL}${cow.image}`} 
                 alt={cow.name}
                 layout="intrinsic"
                 objectFit="cover"

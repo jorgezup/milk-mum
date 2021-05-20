@@ -39,7 +39,7 @@ const TableWeight = ({ cow }: CowProps) => {
     setCreatingWeight(cow)
   }
 
-  const handleEditWeight = (weight) => {
+  const handleEditWeight = (weight: CowWeightProps) => {
     setWeightEditModalOpen(true)
     setWeightEdit(weight)
   }  
@@ -67,7 +67,8 @@ const TableWeight = ({ cow }: CowProps) => {
           </tr>
         </thead>
         <tbody>
-          {cow.weights.map((cowWeight: CowWeightProps) => {
+          {/* Pega o array de pesos, ordena pela data, coloca a data mais recente primeiro */}
+          {(cow.weights.sort((a: CowWeightProps, b: CowWeightProps) => (new Date(a.date).getTime() > new Date(b.date).getTime()) ? -1 : 1)).map((cowWeight: CowWeightProps) => {
             return (
               <tr key={cowWeight.id}>
                 <td>{(cowWeight.weight.toLocaleString('pt-BR'))} kg</td>

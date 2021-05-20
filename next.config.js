@@ -4,6 +4,6 @@ module.exports = {
     defaultLocale: 'pt-BR',
   },
   images: {
-    domains: ['localhost']
+    domains: [process.env.IMAGES_DOMAIN]
   }
 }

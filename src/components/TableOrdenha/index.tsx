@@ -78,7 +78,8 @@ const TableOrdenha = ({ cow }: CowProps) => {
           </tr>
         </thead>
         <tbody>
-          {cow.milkings.map((milking: MilkingProps) => {
+          {/* Pega o array de ordenha, ordena pela data, coloca a data mais recente primeiro */}
+          {(cow.milkings.sort((a: MilkingProps, b: MilkingProps) => (new Date(a.date).getTime() > new Date(b.date).getTime()) ? -1 : 1)).map((milking: MilkingProps) => {
             return (
               <tr key={milking.id}>
                 <td>{(milking.firstMilking.toLocaleString('pt-BR'))} kg</td>
