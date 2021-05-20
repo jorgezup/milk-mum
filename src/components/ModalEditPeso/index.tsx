@@ -2,37 +2,36 @@ import { Field, Form, Formik } from "formik"
 import moment from "moment"
 import router from "next/router"
 import React from "react"
-import { FiX } from "react-icons/fi"
+import { FiX } from 'react-icons/fi'
 import { toast } from "react-toastify"
 import * as Yup from 'yup'
 import Modal from "../../Modal"
 import { api } from "../../services/api"
 import styles from './styles.module.scss'
 
-
-const OrdenhaSchema = Yup.object().shape({
-  firstMilking: Yup.string().required('Se não houve retirada, inserir o valor 0.'),
-  secondMilking: Yup.string().required('Se não houve retirada, inserir o valor 0.'),
-  date: Yup.date().required('Data é obrigatória')
+const WeightSchema = Yup.object().shape({
+  weight: Yup.number().required('Peso é obrigatório'),
+  date: Yup.date().required('Data é obrigatória.')
 })
 
-
-const ModalEditOrdenha = ({ isOpen, setIsOpen, milkingEdit }) => {
-  
+const ModalEditPeso = ({ isOpen, setIsOpen, weightEdit }) => {
   async function onSubmit (values) {
     try {
       const data = {
-        firstMilking: values.firstMilking,
-        secondMilking: values.secondMilking,
-        date: moment(values.formattedDate).format()
+        vacaId: weightEdit.vacaId,
+        weight: values.weight,
+        date: moment(values.date).format()
       }
+    
+      const response = await api.put(`pesos/${weightEdit.id}`, data)
       
-      const response = await api.put(`ordenhas/${milkingEdit.id}`, data)
-  
       if (response.status === 200) {
-        toast.success('Editado com sucesso')
-        router.push(`/visualizar-animal/${milkingEdit.vacaId}`)
+        toast.success('Cadastrado com sucesso')
+        router.push(`/visualizar-animal/${weightEdit.vacaId}`)
         setIsOpen(false)
+      }
+      else {
+        toast.error('Erro ao cadastrar.')
       }
 
     } catch (error) {
@@ -41,16 +40,16 @@ const ModalEditOrdenha = ({ isOpen, setIsOpen, milkingEdit }) => {
       router.push(`/`)
     }
   }
-  
-  const handleCloseModal = () => {
+
+  function handleCloseModal() {
     setIsOpen(false)
   }
-  
+
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
       <div className={styles.container}>
         <header className={styles.header}>
-          <h2>Editar Ordenha</h2>
+          <h2>Editar Peso</h2>
           <button type="button" title="Fechar">
             <FiX onClick={handleCloseModal}/>
           </button>
@@ -58,44 +57,32 @@ const ModalEditOrdenha = ({ isOpen, setIsOpen, milkingEdit }) => {
 
         <Formik 
           initialValues={{
-            ...milkingEdit,
-            date: moment(milkingEdit.date).format('YYYY-MM-DD')
+            weight: weightEdit.weight,
+            date: moment(weightEdit.date).format('YYYY-MM-DD')
           }}
-          validationSchema={OrdenhaSchema}
+          validationSchema={WeightSchema}
           onSubmit={onSubmit}
         >
           {({ values, errors, touched }) => (
             <Form className={styles.form}>
               <label htmlFor="">Nome</label>
               <div className={styles.disabled}>
-                <span>{milkingEdit.cow}</span>
+                <span>{weightEdit.cow}</span>
               </div>
               
-              <label htmlFor="firstMilking">1a Ordenha</label>
+              <label htmlFor="weight">Peso</label>
               <Field 
-                name="firstMilking" 
+                name="weight" 
                 type="number" 
-                placeholder="Valor em Kg. Ex.: 12,2 (12 quilos e 200 gramas)"
+                placeholder="Valor em Kg."
               />
-              {errors.firstMilking && touched.firstMilking ? (
+              {errors.weight && touched.weight ? (
                 <div className={styles.message}>
-                  {errors.firstMilking}
+                  {errors.weight}
                 </div>
               ) : null}
 
-              <label htmlFor="secondMilking">2a Ordenha</label>
-              <Field 
-                name="secondMilking" 
-                type="number"
-                placeholder="Valor em Kg. Ex.: 12,2 (12 quilos e 200 gramas)"
-              />
-              {errors.secondMilking && touched.secondMilking ? (
-                <div className={styles.message}>
-                  {errors.secondMilking}
-                </div>
-              ) : null}
-
-              <label htmlFor="date">Data</label>{}
+              <label htmlFor="date">Data</label>
               <Field name="date" type="date"/>
               {errors.date && touched.date ? (
                 <div className={styles.message}>
@@ -115,4 +102,4 @@ const ModalEditOrdenha = ({ isOpen, setIsOpen, milkingEdit }) => {
   )
 }
 
-export default ModalEditOrdenha 
+export default ModalEditPeso

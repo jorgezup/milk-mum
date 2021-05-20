@@ -6,6 +6,7 @@ import Image from 'next/image';
 import router from 'next/router';
 import React, { useState } from "react";
 import { toast } from 'react-toastify';
+import * as Yup from 'yup';
 import { BackButton } from '../../components/BackButton';
 import { InputFile } from '../../components/InputFile';
 import { api } from "../../services/api";
@@ -33,6 +34,12 @@ interface CowProps {
   }
 }
 
+const AnimalSchema = Yup.object().shape({
+  name: Yup.string().required('Nome é obrigatório'),
+  weight: Yup.number().required('Peso é obrigatório'),
+  born: Yup.date().required('Data de nascimento é obrigatória'),
+})
+
 
 export default function AnimalEdit({ cow }: CowProps) {
   const [selectedFile, setSelectedFile] = useState(null)
@@ -47,7 +54,7 @@ export default function AnimalEdit({ cow }: CowProps) {
 
     const uploadRes = await axios({
       method: 'POST',
-      url: 'http://localhost:1337/upload',
+      url: `${process.env.API_URL}/upload`,
       data: uploadData
     })
 
@@ -72,19 +79,13 @@ export default function AnimalEdit({ cow }: CowProps) {
     }
   }
 
-  function handleCancel() {
-    router.back()
-  }
-
   async function onSubmit(values, actions) {
-    console.log("values", values)
-
     const data = {
       uid: values.name.toLocaleLowerCase(),
       Name: values.name,
       Born: moment(values.born).format('YYYY-MM-DD'),
       childBirth: values.childbirth ? moment(values.childbirth).format('YYYY-MM-DD') : null,
-      image: selectedFile ? await imageUploaded(selectedFile) : ''
+      image: await imageUploaded(selectedFile)
     }
 
     const response = await api.put(`vacas/${cow.id}`, data)
@@ -118,10 +119,10 @@ export default function AnimalEdit({ cow }: CowProps) {
           name: cow.name,
           weightId: cow.weightId,
           weight: cow.weight,
-          born: cow.born,
-          childbirth: cow.childbirth,
+          born: moment(cow.born).format('YYYY-MM-DD'),
           image: cow.image
         }}
+        validationSchema={AnimalSchema}
         onSubmit={onSubmit}
       >
         {({ errors, touched }) => (
@@ -150,19 +151,17 @@ export default function AnimalEdit({ cow }: CowProps) {
               </div>
             ) : null}
 
-            <label htmlFor="">Parto</label>
-            <Field name="childbirth" type="date"/>
-
             <label htmlFor="">Foto</label>
 
             {
               cow.image && cow.image !== null &&
               <Image 
-                src={`http://localhost:1337${cow.image}`} 
+                src={`${process.env.NEXT_PUBLIC_API_URL}${cow.image}`} 
                 alt={cow.name}
-                layout="responsive"
-                width={220}
-                height={140}
+                layout="intrinsic"
+                objectFit="cover"
+                width={300}
+                height={220}
                 priority={true} 
               />
             }
@@ -194,13 +193,13 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const cow = {
     id,
     name: response.data.name,
-    weightId: response.data.pesos.sort((a, b) => (a.id > b.id) ? -1 : 1)[0]?.id,
-    weight: response.data.pesos.sort((a, b) => (a.id > b.id) ? -1 : 1)[0]?.weight,
+    weightId: response.data.weights.sort((a, b) => (a.id > b.id) ? -1 : 1)[0]?.id,
+    weight: response.data.weights.sort((a, b) => (a.id > b.id) ? -1 : 1)[0]?.weight,
     born: moment(response.data.born).format('YYYY-MM-DD'),
     childbirth: moment(response.data.childBirth).format('YYYY-MM-DD'),
     // image: Object.entries(response.data.image).length !== 0 ? response.data.image?.url : '',
     image:response.data.image ? response.data.image?.url : '',
-    milkings: response.data.ordenhas.map((milking: MilkingProps) => {
+    milkings: response.data.milkings.map((milking: MilkingProps) => {
       return {
         ...milking,
         firstMilking: milking.firstMilking.toLocaleString('pt-BR'),

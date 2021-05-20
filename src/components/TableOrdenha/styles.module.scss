@@ -1,0 +1,40 @@
+.wrapper {
+  margin-top: 2rem;
+
+  .buttonAddContent {
+    padding-right: 0;
+    text-align: right;
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+
+    padding: 0 1rem;
+
+    height: 2rem;
+    border-radius: 8px;
+    border: 0;
+    font-weight: 700;
+    transition: filter .2s;
+
+    background: var(--green-700);
+    
+    &:hover {
+      filter: brightness(.82);
+    }
+
+    .add {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-100);
+
+      > span:first-of-type {
+        margin-right: .25rem;
+        font-size: 1.35rem;
+      }
+    }
+  }
+}

@@ -9,41 +9,38 @@ import Modal from "../../Modal"
 import { api } from "../../services/api"
 import styles from './styles.module.scss'
 
-const CalfSchema = Yup.object().shape({
+const CoverageSchema = Yup.object().shape({
   name: Yup.string().required('Nome é obrigatório'),
-  birthDate: Yup.date().required('Data de nascimento é obrigatória'),
+  birthDate: Yup.date().required('Data estimada de nascimento é obrigatória.'),
 })
 
-const ModalCreateCria = ({ isOpen, setIsOpen, creatingCalf }) => {
- 
+const ModalEditCalf = ({ isOpen, setIsOpen, calfEdit }) => {
+
   async function onSubmit (values) {
-    
     try {
-      const cria = {
-        vacaId: creatingCalf.id,
-        cobertura: creatingCalf.coverages[0].id,
+      const data = {
         name: values.name,
         birthDate: moment(values.birthDate).format()
       }
 
-      const response = await api.post(`crias`, cria)
-      
+      const response = await api.put(`crias/${calfEdit.id}`, data)
+  
       if (response.status === 200) {
         toast.success('Cadastrado com sucesso')
-        router.push(`/visualizar-animal/${creatingCalf.id}`)
+        router.push(`/visualizar-animal/${calfEdit.cowId}`)
         setIsOpen(false)
       }
-
-    } catch (error) {
+      else {
+        toast.error('Erro ao cadastrar.')
+      }
+    } catch(error) {
       console.error(error)
       toast.error('Erro inesperado.')
       router.push(`/`)
-      setIsOpen(false)
     }
-
   }
 
-  function handleCancel() {
+  function handleCloseModal() {
     setIsOpen(false)
   }
 
@@ -51,30 +48,33 @@ const ModalCreateCria = ({ isOpen, setIsOpen, creatingCalf }) => {
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
       <div className={styles.container}>
         <header className={styles.header}>
-          <h2>Registrar Cria</h2>
+          <h2>Editar Cria</h2>
           <button type="button" title="Fechar">
-            <FiX onClick={handleCancel}/>
+            <FiX onClick={handleCloseModal}/>
           </button>
         </header>
 
         <Formik 
           initialValues={{
-            name: '',
-            birthDate: moment().format('YYYY-MM-DD'),
+            ...calfEdit,
+            birthDate: moment(calfEdit.birthDate).format('YYYY-MM-DD'),
           }}
-          validationSchema={CalfSchema}
+          validationSchema={CoverageSchema}
           onSubmit={onSubmit}
         >
           {({ values, errors, touched }) => (
             <Form className={styles.form}>
               <label htmlFor="name">Nome</label>
-              <Field name="name" type="text"/>
+              <Field 
+                name="name" 
+                type="text" 
+              />
               {errors.name && touched.name ? (
                 <div className={styles.message}>
                   {errors.name}
                 </div>
-              ) : null}
-              
+              ) : null}              
+
               <label htmlFor="birthDate">Data de Nascimento</label>
               <Field name="birthDate" type="date"/>
               {errors.birthDate && touched.birthDate ? (
@@ -84,7 +84,7 @@ const ModalCreateCria = ({ isOpen, setIsOpen, creatingCalf }) => {
               ) : null}
 
               <div className={styles.buttons}>
-                <button type="submit" className={styles.confirm}>Cadastrar</button>
+                <button type="submit" className={styles.confirm}>Editar</button>
               </div>
 
             </Form>
@@ -95,4 +95,4 @@ const ModalCreateCria = ({ isOpen, setIsOpen, creatingCalf }) => {
   )
 }
 
-export default ModalCreateCria
+export default ModalEditCalf

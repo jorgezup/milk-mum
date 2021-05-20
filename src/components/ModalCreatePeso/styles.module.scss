@@ -46,6 +46,8 @@
   label {
     margin: .5rem 0;
     display: block;
+    color: var(--gray-850);
+    font-weight: 600;
   }
 
   .disabled {
@@ -81,4 +83,8 @@
   .confirm {
     background: var(--green-700);
   }
+}
+
+.message {
+  color: red;
 }

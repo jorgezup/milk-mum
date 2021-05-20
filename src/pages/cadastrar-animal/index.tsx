@@ -24,7 +24,7 @@ export default function AnimalRegister() {
 
     const uploadRes = await axios({
       method: 'POST',
-      url: 'http://localhost:1337/upload',
+      url: `${process.env.API_URL}/upload`,
       data: uploadData
     })
 
@@ -33,7 +33,7 @@ export default function AnimalRegister() {
     }
     return uploadRes.data[0]
   }
-  
+    
   
   async function onSubmit(values) {
     const data = {
@@ -53,12 +53,16 @@ export default function AnimalRegister() {
 
       await api.post('pesos', dataWeight)
 
-      toast.success('Editado com sucesso')
+      toast.success('Cadastrado com sucesso')
       router.push('/listar-animais')
     }
     else {
       toast.error('Erro ao adicionar.')
     }
+  }
+
+  const handleCancel = () => {
+    router.push('/listar-animais')
   }
   
   return (
@@ -113,8 +117,10 @@ export default function AnimalRegister() {
             <div className={styles.buttons}>
               <button 
                 type="button" 
-                className={styles.cancel}>
-                  Cancelar
+                className={styles.cancel}
+                onClick={handleCancel}
+              >
+                Cancelar
               </button>
               
               <button 

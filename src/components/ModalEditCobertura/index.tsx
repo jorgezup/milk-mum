@@ -11,26 +11,25 @@ import styles from './styles.module.scss'
 
 const CoverageSchema = Yup.object().shape({
   coverage: Yup.string().required('Tipo de cobertura é obrigatório'),
-  coverageDate: Yup.date().required('Data estimada de cobertura é obrigatória'),
-  birthEstimate: Yup.date().required('Data estimada de nascimento é obrigatória'),
+  coverageDate: Yup.date().required('Data estimada de cobertura é obrigatória.'),
+  birthEstimate: Yup.date().required('Data estimada de nascimento é obrigatória.'),
 })
 
-const ModalCreateCobertura = ({ isOpen, setIsOpen, creatingCoverage }) => {
-  
+const ModalEditCobertura = ({ isOpen, setIsOpen, coverageEdit }) => {
   async function onSubmit (values) {
     try {
       const data = {
-        vacaId: creatingCoverage.id,
+        vacaId: coverageEdit.vacaId.id,
         semen: values.coverage === 'semen' ? true :  false,
         coverageDate: moment(values.coverageDate).format(),
         birthEstimate: moment(values.birthEstimate).format()
       }
   
-      const response = await api.post(`coberturas`, data)
+      const response = await api.put(`coberturas/${coverageEdit.id}`, data)
   
       if (response.status === 200) {
         toast.success('Cadastrado com sucesso')
-        router.push(`/visualizar-animal/${creatingCoverage.id}`)
+        router.push(`/visualizar-animal/${coverageEdit.vacaId.id}`)
         setIsOpen(false)
       }
       else {
@@ -51,7 +50,7 @@ const ModalCreateCobertura = ({ isOpen, setIsOpen, creatingCoverage }) => {
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
       <div className={styles.container}>
         <header className={styles.header}>
-          <h2>Registrar Cobertura</h2>
+          <h2>Editar Cobertura</h2>
           <button type="button" title="Fechar">
             <FiX onClick={handleCloseModal}/>
           </button>
@@ -59,9 +58,9 @@ const ModalCreateCobertura = ({ isOpen, setIsOpen, creatingCoverage }) => {
 
         <Formik 
           initialValues={{
-            coverage: '',
-            coverageDate: moment().format('YYYY-MM-DD'),
-            birthEstimate: '',
+            coverage: coverageEdit.semen ? "semen" : "bull",
+            coverageDate: moment(coverageEdit.coverageDate).format('YYYY-MM-DD'),
+            birthEstimate: moment(coverageEdit.birthEstimate).format('YYYY-MM-DD'),
           }}
           validationSchema={CoverageSchema}
           onSubmit={onSubmit}
@@ -70,24 +69,24 @@ const ModalCreateCobertura = ({ isOpen, setIsOpen, creatingCoverage }) => {
             <Form className={styles.form}>
               <label htmlFor="">Nome</label>
               <div className={styles.disabled}>
-                <span>{creatingCoverage.name}</span>
+                <span>{coverageEdit.cow}</span>
               </div>
               
               <div id="coverage-radio-group" className={styles.radioHeader}>Cobertura</div>
               <div role="group" aria-labelledby="coverage-radio-group" className={styles.radioGroup} >
                 <label>
-                  <Field type="radio" id="coverage" name="coverage" value="bull" />
+                  <Field type="radio" name="coverage" value="bull" />
                   Touro
                 </label>
                 <label>
-                  <Field type="radio" id="coverage"  name="coverage" value="semen" />
+                  <Field type="radio" name="coverage" value="semen"/>
                   Inseminação
                 </label>
                 {errors.coverage && touched.coverage ? (
                   <div className={styles.message}>
                     {errors.coverage}
                   </div>
-                ) : null}
+                ) : null}                
               </div>
 
               <label htmlFor="coverageDate">Data Estimada da Cobertura</label>
@@ -107,7 +106,7 @@ const ModalCreateCobertura = ({ isOpen, setIsOpen, creatingCoverage }) => {
               ) : null}
 
               <div className={styles.buttons}>
-                <button type="submit" className={styles.confirm}>Cadastrar</button>
+                <button type="submit" className={styles.confirm}>Editar</button>
               </div>
 
             </Form>
@@ -118,4 +117,4 @@ const ModalCreateCobertura = ({ isOpen, setIsOpen, creatingCoverage }) => {
   )
 }
 
-export default ModalCreateCobertura
+export default ModalEditCobertura
