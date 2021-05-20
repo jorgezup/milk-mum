@@ -15,49 +15,61 @@ export default function AnimalRegister() {
   const [selectedFile, setSelectedFile] = useState(null)
 
   const imageUploaded = async function(file) {
-    if (!file) {
-      return
-    }
-    
-    const uploadData = new FormData()
-    uploadData.append('files', file)
+    try {
+      if (!file) {
+        return
+      }
+      
+      const uploadData = new FormData()
+      uploadData.append('files', file)
 
-    const uploadRes = await axios({
-      method: 'POST',
-      url: `${process.env.API_URL}upload`,
-      data: uploadData
-    })
+      const uploadRes = await axios({
+        method: 'POST',
+        url: `${process.env.API_URL}upload`,
+        data: uploadData
+      })
 
-    if (uploadRes.status !== 200) {
-      toast.error('Erro ao fazer upload da Imagem')
+      if (uploadRes.status !== 200) {
+        toast.error('Erro ao fazer upload da Imagem')
+      }
+      return uploadRes.data[0]
+    } catch(error) {
+      console.error(error)
+      toast.error('Erro ao adicionar imagem.')
+      router.push(`/`)
     }
-    return uploadRes.data[0]
   }
     
   
   async function onSubmit(values) {
-    const data = {
-      name: values.name,
-      born: moment(values.born).format('YYYY-MM-DD'),
-      image: selectedFile ? await imageUploaded(selectedFile) : ''
-    }
-
-    const response = await api.post('vacas', data)
-
-    if (response.status === 200) {
-      const dataWeight = {
-        vacaId: response.data.id,
-        weight: values.weight,
-        date: moment(Date.now()).format('YYYY-MM-DD')
+    try {
+      const data = {
+        name: values.name,
+        born: moment(values.born).format('YYYY-MM-DD'),
+        image: selectedFile ? await imageUploaded(selectedFile) : ''
       }
 
-      await api.post('pesos', dataWeight)
+      const response = await api.post('vacas', data)
 
-      toast.success('Cadastrado com sucesso')
-      router.push('/listar-animais')
-    }
-    else {
-      toast.error('Erro ao adicionar.')
+      if (response.status === 200) {
+        const dataWeight = {
+          vacaId: response.data.id,
+          weight: values.weight,
+          date: moment(Date.now()).format('YYYY-MM-DD')
+        }
+
+        await api.post('pesos', dataWeight)
+
+        toast.success('Cadastrado com sucesso')
+        router.push('/listar-animais')
+      }
+      else {
+        toast.error('Erro ao adicionar.')
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error('Erro inesperado.')
+      router.push(`/`)
     }
   }
 

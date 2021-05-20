@@ -45,23 +45,29 @@ export default function AnimalEdit({ cow }: CowProps) {
   const [selectedFile, setSelectedFile] = useState(null)
 
   const imageUploaded = async function(file) {
-    if (!file) {
-      return
-    }
-    
-    const uploadData = new FormData()
-    uploadData.append('files', file)
+    try {   
+      if (!file) {
+        return
+      }
+      
+      const uploadData = new FormData()
+      uploadData.append('files', file)
 
-    const uploadRes = await axios({
-      method: 'POST',
-      url: `${process.env.API_URL}upload`,
-      data: uploadData
-    })
+      const uploadRes = await axios({
+        method: 'POST',
+        url: `${process.env.API_URL}upload`,
+        data: uploadData
+      })
 
-    if (uploadRes.status !== 200) {
-      toast.error('Erro ao fazer upload da Imagem')
+      if (uploadRes.status !== 200) {
+        toast.error('Erro ao fazer upload da Imagem')
+      }
+      return uploadRes.data[0]
+    } catch (error) {
+      console.error(error)
+      toast.error('Erro ao adicionar imagem.')
+      router.push(`/`)
     }
-    return uploadRes.data[0]
   }
 
   async function handleDelete() {
@@ -80,29 +86,35 @@ export default function AnimalEdit({ cow }: CowProps) {
   }
 
   async function onSubmit(values, actions) {
-    const data = {
-      uid: values.name.toLocaleLowerCase(),
-      Name: values.name,
-      Born: moment(values.born).format('YYYY-MM-DD'),
-      childBirth: values.childbirth ? moment(values.childbirth).format('YYYY-MM-DD') : null,
-      image: await imageUploaded(selectedFile)
-    }
-
-    const response = await api.put(`vacas/${cow.id}`, data)
-
-    if (response.status === 200) {
-      const dataWeight = {
-        vacaId: response.data.id,
-        weight: values.weight,
+    try {
+      const data = {
+        uid: values.name.toLocaleLowerCase(),
+        Name: values.name,
+        Born: moment(values.born).format('YYYY-MM-DD'),
+        childBirth: values.childbirth ? moment(values.childbirth).format('YYYY-MM-DD') : null,
+        image: await imageUploaded(selectedFile)
       }
 
-      await api.put(`pesos/${cow.weightId}`, dataWeight)
+      const response = await api.put(`vacas/${cow.id}`, data)
 
-      toast.success('Editado com sucesso')
-      router.push('/listar-animais')
-    }
-    else {
-      toast.error('Erro ao adicionar.')
+      if (response.status === 200) {
+        const dataWeight = {
+          vacaId: response.data.id,
+          weight: values.weight,
+        }
+
+        await api.put(`pesos/${cow.weightId}`, dataWeight)
+
+        toast.success('Editado com sucesso')
+        router.push('/listar-animais')
+      }
+      else {
+        toast.error('Erro ao adicionar.')
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error('Erro inesperado.')
+      router.push(`/`)
     }
   }
 
