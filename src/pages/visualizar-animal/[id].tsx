@@ -228,18 +228,18 @@ export default function AnimalRegister({ cow }: CowProps) {
 
         </div>
 
-        <div className={styles.right}>
           {
-            cow.image &&
-            <Image
-              src={`${process.env.NEXT_PUBLIC_API_URL}${cow.image}`}
-              alt={cow.name}
-              layout="fill"
-              objectFit="cover"
-              priority={true}
-            />
+          cow.image &&
+            <div className={styles.right}>
+              <Image
+                src={`${process.env.NEXT_PUBLIC_API_URL}${cow.image}`}
+                alt={cow.name}
+                layout="fill"
+                objectFit="cover"
+                priority={true}
+              />
+            </div>
           }
-        </div>
       </div>
       <div className={styles.buttons}>
         <button
