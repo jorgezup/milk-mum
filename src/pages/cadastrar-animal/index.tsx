@@ -19,13 +19,13 @@ export default function AnimalRegister() {
       if (!file) {
         return
       }
-      
+
       const uploadData = new FormData()
       uploadData.append('files', file)
 
       const uploadRes = await axios({
         method: 'POST',
-        url: `${process.env.API_URL}upload`,
+        url: `${process.env.NEXT_PUBLIC_API_URL}upload`,
         data: uploadData
       })
 

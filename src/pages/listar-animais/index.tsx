@@ -1,6 +1,6 @@
 import moment from 'moment'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { GiCow } from 'react-icons/gi'
 import { api } from '../../services/api'
 import styles from './styles.module.scss'
@@ -29,23 +29,28 @@ type ICow = {
 }
 
 
-export default function AnimalList() {
-  const [cows, setCows] = useState<ICow[]>([])
+export default function AnimalList({ cows }) {
+  // const [cows, setCows] = useState<ICow[]>([])
 
-  useEffect(() => {
-    async function getCows() {
-      const response = await api.get('vacas')
-      const cowData = response.data.map((cow: ICow) => {
-        return {
-          ...cow,
-          weights: cow?.weights?.sort((a:IWeight, b:IWeight) => (a.id > b.id) ? -1 : 1),
-          milkings: cow?.milkings?.sort((a:IMilking, b:IMilking) => (a.id > b.id) ? -1 : 1),
-        }
-      })
-      setCows(cowData)
-    }
-    getCows()
-  }, [])
+  // useEffect(() => {
+  //   async function getCows() {
+  //     const response = await api.get('vacas')
+  //     const cowData = response.data.map((cow: ICow) => {
+  //       return {
+  //         ...cow,
+  //         weights: cow?.weights?.sort((a:IWeight, b:IWeight) => (a.id > b.id) ? -1 : 1),
+  //         milkings: cow?.milkings?.sort((a:IMilking, b:IMilking) => (a.id > b.id) ? -1 : 1),
+  //       }
+  //     })
+  //     setCows(cowData)
+  //   }
+  //   getCows()
+  // }, [])
+
+  // const handleViewCow = (cow) => {
+  //   // AnimalRegister(cow.id)
+  //   router.push(`visualizar-animal/${cow.id}`)
+  // }
 
   return (
     <div className={styles.container}>
@@ -69,14 +74,13 @@ export default function AnimalList() {
           </tr>
         </thead>
         <tbody>
-          {cows.map((cow) => (
+          {cows.map((cow: ICow) => (
             <Link
               key={cow.id}
               href={`visualizar-animal/${cow.id}`}
             >
               <tr
                 key={cow.id}
-                // onClick={() => handleViewCow(cow)}
                 title="Visualizar animal"
               >
                 <td>{cow?.name}</td>
@@ -109,4 +113,16 @@ export default function AnimalList() {
       </table>
     </div>
   )
+}
+
+export const getStaticProps = async() => {
+  const res = await api.get(`vacas`)
+
+  const cows: ICow[] = res.data
+  
+  return {
+    props: {
+      cows
+    }
+  }
 }

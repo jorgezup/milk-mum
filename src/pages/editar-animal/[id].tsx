@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Field, Form, Formik } from 'formik';
 import moment from 'moment';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Image from 'next/image';
 import router from 'next/router';
 import React, { useState } from "react";
@@ -197,7 +197,7 @@ export default function AnimalEdit({ cow }: CowProps) {
   )
 }
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const { id } = params
 
   const response = await api.get(`vacas/${id}`)
@@ -226,6 +226,5 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     props: {
       cow,
     },
-    revalidate: 60 * 60 * 24 // 1 day
   }
 }

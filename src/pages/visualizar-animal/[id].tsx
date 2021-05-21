@@ -1,7 +1,8 @@
 import moment from "moment";
-import { GetServerSideProps } from "next";
+import { GetStaticPaths, GetStaticProps } from "next";
 import Image from 'next/image';
 import Link from "next/link";
+import { useRouter } from 'next/router';
 import React, { useState } from "react";
 import { FaEdit, FaGenderless, FaWeight } from 'react-icons/fa';
 import { GiCow, GiMilkCarton } from 'react-icons/gi';
@@ -44,7 +45,6 @@ type CowWeightProps = {
 type ICow = {
   id: number;
   name: string;
-  weight: number;
   born: string;
   image: string;
   age: number;
@@ -58,6 +58,12 @@ interface CowProps {
 }
 
 export default function AnimalRegister({ cow }: CowProps) {
+  const { isFallback } = useRouter()
+
+  if (isFallback) {
+    return <p>Carregando</p>
+  }
+
   const lactationPeriod = 305 //dias
   const lactationPeriodMoreOneDay = lactationPeriod + 1  //dias
 
@@ -232,7 +238,7 @@ export default function AnimalRegister({ cow }: CowProps) {
           cow.image &&
             <div className={styles.right}>
               <Image
-                src={`${process.env.NEXT_PUBLIC_API_URL}${cow.image}`}
+                src={`${process.env.IMAGES_DOMAIN}${cow.image}`}
                 alt={cow.name}
                 layout="fill"
                 objectFit="cover"
@@ -335,10 +341,62 @@ export default function AnimalRegister({ cow }: CowProps) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const { id } = params
+// export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+//   const { id } = params
 
+//   const response = await api.get(`vacas/${id}`)
+
+//   async function getCoverages(coverages: CowCoveragesProps[]) {
+//     const arrayOfPromisses = coverages.map(async (cowCoverage: CowCoveragesProps) => {
+//       const response = await api.get(`coberturas/${cowCoverage.id}`)
+//       return response.data
+//     })
+//     return await Promise.all(arrayOfPromisses)
+//   }
+
+//   const cow = {
+//     id,
+//     name: response.data.name,
+//     born: moment(response.data.born).format('DD/MM/YYYY'),
+//     age: moment(Date.now()).diff(response.data.born, 'months'),
+//     image: response.data.image ? response.data.image?.url : '',
+//     weights: response.data?.weights?.sort((a: CowWeightProps, b: CowWeightProps) => (a.id > b.id) ? -1 : 1),
+//     coverages: await getCoverages(response.data.coverages.sort((a: CowCoveragesProps, b: CowCoveragesProps) => (a.id > b.id) ? -1 : 1)),
+//     milkings: response.data.milkings.map((milking: MilkingProps) => {
+//       return {
+//         ...milking,
+//         total: (milking.firstMilking + milking.secondMilking),
+//       }
+//     })
+//   }
+
+//   return {
+//     props: {
+//       cow,
+//     },
+//   }
+// }
+
+export const getStaticPaths: GetStaticPaths = async() => {
+  const res = await api.get(`vacas`)
+
+  const cows = res.data
+
+  const paths = cows.map((cow: ICow) => ({
+    params: { id: cow.id.toString() }
+  }))
+
+  return {
+    paths,
+    fallback: true
+  }
+}
+
+export const getStaticProps: GetStaticProps = async(context) => {
+  const { id } = context.params
   const response = await api.get(`vacas/${id}`)
+
+  // const cow: ICow = response.data
 
   async function getCoverages(coverages: CowCoveragesProps[]) {
     const arrayOfPromisses = coverages.map(async (cowCoverage: CowCoveragesProps) => {
@@ -348,8 +406,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     return await Promise.all(arrayOfPromisses)
   }
 
-  const cow = {
-    id,
+  const cow: ICow = {
+    id: Number(id),
     name: response.data.name,
     born: moment(response.data.born).format('DD/MM/YYYY'),
     age: moment(Date.now()).diff(response.data.born, 'months'),
@@ -363,10 +421,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       }
     })
   }
-
+  
   return {
     props: {
-      cow,
+      cow
     },
+    revalidate: 60
   }
 }
