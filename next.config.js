@@ -4,6 +4,6 @@ module.exports = {
     defaultLocale: 'pt-BR',
   },
   images: {
-    domains: [process.env.IMAGES_DOMAIN]
+    domains: ['res.cloudinary.com']
   }
 }

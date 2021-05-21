@@ -10,7 +10,6 @@ import animalFormSchema from "../../schemas/animalFormSchema";
 import { api } from "../../services/api";
 import styles from './styles.module.scss';
 
-
 export default function AnimalRegister() {
   const [selectedFile, setSelectedFile] = useState(null)
 
@@ -22,10 +21,10 @@ export default function AnimalRegister() {
       
       const uploadData = new FormData()
       uploadData.append('files', file)
-
+      
       const uploadRes = await axios({
         method: 'POST',
-        url: `${process.env.API_URL}upload`,
+        url: `${process.env.NEXT_PUBLIC_API_URL}upload`,
         data: uploadData
       })
 
