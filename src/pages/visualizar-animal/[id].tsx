@@ -411,7 +411,7 @@ export const getStaticProps: GetStaticProps = async(context) => {
     name: response.data.name,
     born: moment(response.data.born).format('DD/MM/YYYY'),
     age: moment(Date.now()).diff(response.data.born, 'months'),
-    image: response.data.image ? response.data.image?.url : '',
+    image: response.data?.image?.url,
     weights: response.data?.weights?.sort((a: CowWeightProps, b: CowWeightProps) => (a.id > b.id) ? -1 : 1),
     coverages: await getCoverages(response.data.coverages.sort((a: CowCoveragesProps, b: CowCoveragesProps) => (a.id > b.id) ? -1 : 1)),
     milkings: response.data.milkings.map((milking: MilkingProps) => {
