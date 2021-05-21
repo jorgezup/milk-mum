@@ -1,5 +1,6 @@
 import moment from 'moment'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import React from 'react'
 import { GiCow } from 'react-icons/gi'
 import { api } from '../../services/api'
@@ -51,6 +52,12 @@ export default function AnimalList({ cows }) {
   //   // AnimalRegister(cow.id)
   //   router.push(`visualizar-animal/${cow.id}`)
   // }
+
+  const { isFallback } = useRouter()
+
+  if (isFallback) {
+    return <p>Carregando</p>
+  }
 
   return (
     <div className={styles.container}>

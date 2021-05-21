@@ -238,7 +238,7 @@ export default function AnimalRegister({ cow }: CowProps) {
           cow.image &&
             <div className={styles.right}>
               <Image
-                src={`${process.env.IMAGES_DOMAIN}${cow.image}`}
+                src={`${cow.image}`}
                 alt={cow.name}
                 layout="fill"
                 objectFit="cover"
