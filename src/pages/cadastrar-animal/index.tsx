@@ -14,7 +14,7 @@ export default function AnimalRegister() {
   const [selectedFile, setSelectedFile] = useState(null)
 
   const imageUploaded = async function(file) {
-    try {
+    
       if (!file) {
         return
       }
@@ -24,19 +24,15 @@ export default function AnimalRegister() {
       
       const uploadRes = await axios({
         method: 'POST',
-        url: `${process.env.NEXT_PUBLIC_API_URL}upload`,
+        url: `${process.env.NEXT_PUBLIC_API_URL}/upload`,
         data: uploadData
       })
-
-      if (uploadRes.status !== 200) {
-        toast.error('Erro ao fazer upload da Imagem')
-      }
+      
+      // if (uploadRes.status !== 200) {
+      //   toast.error('Erro ao fazer upload da Imagem')
+      // }
       return uploadRes.data[0]
-    } catch(error) {
-      console.error(error)
-      toast.error('Erro ao adicionar imagem.')
-      router.push(`/`)
-    }
+    
   }
     
   
@@ -45,7 +41,7 @@ export default function AnimalRegister() {
       const data = {
         name: values.name,
         born: moment(values.born).format('YYYY-MM-DD'),
-        image: selectedFile ? await imageUploaded(selectedFile) : ''
+        // image: selectedFile ? await imageUploaded(selectedFile) : ''
       }
 
       const response = await api.post('vacas', data)
@@ -61,6 +57,17 @@ export default function AnimalRegister() {
 
         toast.success('Cadastrado com sucesso')
         router.push('/listar-animais')
+
+        if (selectedFile) {
+          const imageResponse = await api.put(`/vacas/${response.data.id}`, {
+            image: await imageUploaded(selectedFile)
+          })
+          if ((!imageResponse) || (imageResponse.status !== 200)) {
+            toast.error(`Erro ao adicionar imagem da Vaca ${response.data.name}.
+            \nContate o administrador`)
+          }
+        }
+
       }
       else {
         toast.error('Erro ao adicionar.')

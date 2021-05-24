@@ -47,23 +47,23 @@ const TableWeight = ({ cow }: CowProps) => {
   return (
     <div className={styles.wrapper}>
 
+      <div className={styles.buttonAddContent}>
+        <button
+          type="button"
+          title="Cadastrar Ordenha"
+          onClick={handleCreateWeight}
+        >
+        <div className={styles.add}>
+          <span>+</span>
+          <span>Peso</span>
+        </div>
+      </button>
+      </div>
       <table className={styles.table}>
         <thead>
           <tr>
             <th>Peso</th>
             <th>Data</th>
-            <th className={styles.buttonAddContent}>
-              <button
-                type="button"
-                title="Cadastrar Ordenha"
-                onClick={handleCreateWeight}
-              >
-                <div className={styles.add}>
-                  <span>+</span>
-                  <span>Peso</span>
-                </div>
-              </button>
-            </th>
           </tr>
         </thead>
         <tbody>

@@ -1,8 +1,9 @@
 import moment from 'moment'
+import { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import React from 'react'
 import { GiCow } from 'react-icons/gi'
+import useSWR from 'swr'
 import { api } from '../../services/api'
 import styles from './styles.module.scss'
 
@@ -29,8 +30,22 @@ type ICow = {
   weights: IWeight[];
 }
 
+const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalList({ cows }) {
+
+export default function AnimalList(props) {
+  const initialData = props.data
+  const { data: cows, error } = useSWR(`/vacas`, fetcher, { initialData})
+
+
+  if (!cows) {
+    return (
+      <div style={{flex: 1}}>
+        <p>Carregando...</p>
+      </div>
+    )
+  }
+
   // const [cows, setCows] = useState<ICow[]>([])
 
   // useEffect(() => {
@@ -53,11 +68,11 @@ export default function AnimalList({ cows }) {
   //   router.push(`visualizar-animal/${cow.id}`)
   // }
 
-  const { isFallback } = useRouter()
+  // const { isFallback } = useRouter()
 
-  if (isFallback) {
-    return <p>Carregando</p>
-  }
+  // if (isFallback) {
+  //   return <p>Carregando</p>
+  // }
 
   return (
     <div className={styles.container}>
@@ -83,7 +98,7 @@ export default function AnimalList({ cows }) {
         <tbody>
           {cows.map((cow: ICow) => (
             <Link
-              key={cow.id}
+              key={cow?.id}
               href={`visualizar-animal/${cow.id}`}
             >
               <tr
@@ -122,12 +137,22 @@ export default function AnimalList({ cows }) {
   )
 }
 
-export const getStaticProps = async() => {
-  const res = await api.get(`vacas`)
+// export const getStaticProps = async() => {
+//   const res = await api.get(`vacas`)
 
-  const cows: ICow[] = res.data
+//   const cows: ICow[] = res.data
   
-  return {
+//   return {
+//     props: {
+//       cows
+//     }
+//   }
+// }
+
+export const getServerSideProps: GetServerSideProps = async() => {
+  const cows: ICow[] = await fetcher(`/vacas`)
+  // const {data: cows} = useFetch('/vacas')
+  return { 
     props: {
       cows
     }

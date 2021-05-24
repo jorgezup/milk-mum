@@ -1,7 +1,6 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import React, { useEffect, useState } from "react";
-import { useScrollBlock } from '../../../util/useScrollBlock';
+import { useScrollBlock } from '../../../hooks/useScrollBlock';
 import Burger from '../Burger';
 import RightNav from '../RightNav';
 import styles from './styles.module.scss';
@@ -18,17 +17,14 @@ const Navbar = () => {
   return (
     <div className={styles.navbar}>
       <div className={styles.wrapper}>
-        <Link href="/">
-          <Image 
-            src="/images/logo.png" 
-            alt="Milk Mum" 
-            layout="intrinsic"
-            // objectFit="contain"
-            width={80}
-            height={80}
-            priority={true} 
-          />
-        </Link>
+        <Image 
+          src="/images/logo.png" 
+          alt="Milk Mum" 
+          layout="intrinsic"
+          width={80}
+          height={80}
+          priority={true} 
+        />
         <RightNav isOpen={isOpen} setIsOpen={setIsOpen}/>
         <Burger isOpen={isOpen} setIsOpen={setIsOpen}/>
       </div>

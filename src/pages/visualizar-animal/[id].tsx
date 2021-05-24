@@ -1,5 +1,6 @@
 import moment from "moment";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
+import Head from "next/head";
 import Image from 'next/image';
 import Link from "next/link";
 import { useRouter } from 'next/router';
@@ -57,7 +58,9 @@ interface CowProps {
   cow: ICow;
 }
 
-export default function AnimalRegister({ cow }: CowProps) {
+const fetcher = (url: string) => api.get(url).then(res => res.data)
+
+export default function AnimalDetails({ cow }: CowProps) {
   const { isFallback } = useRouter()
 
   if (isFallback) {
@@ -107,57 +110,61 @@ export default function AnimalRegister({ cow }: CowProps) {
   }
 
   const scrollToTarget = (sectionRef) => {
-    setTimeout(() =>{
+    setTimeout(() => {
       sectionRef.current.scrollIntoView({
         behavior: 'smooth'
-      }) 
+      })
     }, 200);
   }
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <div className={styles.title}>
-          <h2>{cow?.name}</h2>
-          <Link href={`/editar-animal/${cow.id}`}>
-            <a title="Editar animal">
-              <FaEdit />
-            </a>
-          </Link>
-        </div>
-        <BackButton />
-      </header>
-
-      <div className={styles.content}>
-        <div className={styles.left}>
-
-          <div className={styles.animalData}>
-            <label htmlFor="">Nome</label>
-            <div className={styles.disabled}>
-              <span>{cow?.name}</span>
-            </div>
-
-            <label htmlFor="">Peso</label>
-            <div className={styles.disabled}>
-              <span>{cow.weights?.[0]?.weight} kg</span>
-            </div>
-
-            <label htmlFor="">Idade</label>
-            <div className={styles.disabled}>
-              <span>{cow?.age} meses</span>
-            </div>
+    <>
+      <Head>
+        <title>{cow.name}</title>
+      </Head>
+      <div className={styles.container}>
+        <header className={styles.header}>
+          <div className={styles.title}>
+            <h2>{cow?.name}</h2>
+            <Link href={`/editar-animal/${cow.id}`}>
+              <a title="Editar animal">
+                <FaEdit />
+              </a>
+            </Link>
           </div>
+          <BackButton />
+        </header>
 
-          <div className={styles.animalInformations}>
+        <div className={styles.content}>
+          <div className={styles.left}>
+
+            <div className={styles.animalData}>
+              <label htmlFor="">Nome</label>
+              <div className={styles.disabled}>
+                <span>{cow?.name}</span>
+              </div>
+
+              <label htmlFor="">Peso</label>
+              <div className={styles.disabled}>
+                <span>{cow.weights?.[0]?.weight} kg</span>
+              </div>
+
+              <label htmlFor="">Idade</label>
+              <div className={styles.disabled}>
+                <span>{cow?.age} meses</span>
+              </div>
+            </div>
+
+            <div className={styles.animalInformations}>
               {
                 //Em gestação
                 ((cow.coverages?.[0]?.cria === null) &&
-                new Date().getTime() < new Date(cow.coverages?.[0]?.birthEstimate).getTime()) &&
+                  new Date().getTime() < new Date(cow.coverages?.[0]?.birthEstimate).getTime()) &&
                 <>
                   <h1>{(cow.coverages[0].cria === null)}</h1>
                   <h1>{Date.now().toString() < new Date(cow.coverages?.[0]?.birthEstimate).toString()}</h1>
                   <h1>{((cow.coverages[0].cria === null) &&
-                Date.now().toString() < new Date(cow.coverages?.[0]?.birthEstimate).toString())}</h1>
+                    Date.now().toString() < new Date(cow.coverages?.[0]?.birthEstimate).toString())}</h1>
                   <div className={styles.gestation}>
                     <span>Gestação</span>
                   </div>
@@ -170,7 +177,7 @@ export default function AnimalRegister({ cow }: CowProps) {
               {
                 //Cadastrar cria, data maior que a data prevista de nascimento
                 ((cow.coverages?.[0]?.cria === null) &&
-                new Date().getTime() > new Date(cow.coverages?.[0]?.birthEstimate).getTime()) &&
+                  new Date().getTime() > new Date(cow.coverages?.[0]?.birthEstimate).getTime()) &&
                 <>
                   <div className={styles.warnings}>
                     <TiWarning />
@@ -201,8 +208,8 @@ export default function AnimalRegister({ cow }: CowProps) {
                 </>
               }
 
-            {
-              //Vaca Parida
+              {
+                //Vaca Parida
                 cow.coverages[0]?.cria !== undefined && cow.coverages[0].cria !== null &&
                 Math.abs(lactationPeriod - moment(Date.now()).diff(cow.coverages?.[0]?.cria.birthDate, 'days')) > 25 &&
                 <>
@@ -227,15 +234,12 @@ export default function AnimalRegister({ cow }: CowProps) {
               }
 
 
+            </div>
+
           </div>
 
-
-
-
-        </div>
-
           {
-          cow.image &&
+            cow.image &&
             <div className={styles.right}>
               <Image
                 src={`${cow.image}`}
@@ -246,105 +250,154 @@ export default function AnimalRegister({ cow }: CowProps) {
               />
             </div>
           }
-      </div>
-      <div className={styles.buttons}>
-        <button
-          type="button"
-          className={styles.milking}
-          onClick={handleOpenTableOrdenha}
-          title="Mostrar ordenhas"
-        >
-          <GiMilkCarton />
-          <span>|</span>
+        </div>
+        <div className={styles.buttons}>
+          <button
+            type="button"
+            className={styles.milking}
+            onClick={handleOpenTableOrdenha}
+            title="Mostrar ordenhas"
+          >
+            <GiMilkCarton />
+            <span>|</span>
             Ordenha
         </button>
 
-        <button
-          type="button"
-          className={styles.weight}
-          onClick={handleOpenTableWeight}
-          title="Mostrar pesos"
-        >
-          <FaWeight />
-          <span>|</span>
+          <button
+            type="button"
+            className={styles.weight}
+            onClick={handleOpenTableWeight}
+            title="Mostrar pesos"
+          >
+            <FaWeight />
+            <span>|</span>
             Peso
         </button>
 
-        <button
-          type="button"
-          className={styles.coverage}
-          onClick={handleOpenTableCoverage}
-          title="Mostrar coberturas"
-        >
-          <FaGenderless />
-          <span>|</span>
+          <button
+            type="button"
+            className={styles.coverage}
+            onClick={handleOpenTableCoverage}
+            title="Mostrar coberturas"
+          >
+            <FaGenderless />
+            <span>|</span>
             Coberturas
         </button>
 
-        {
-          ((cow.coverages.length > 1) || (cow.coverages?.[0]?.cria !== undefined)) &&
-          <button
-            type="button"
-            className={styles.born}
-            onClick={handleOpenTableCalf}
-            title="Mostrar crias"
-          >
-            <GiCow />
-            <span>|</span>
+          {
+            ((cow.coverages.length > 1) || (cow.coverages?.[0]?.cria !== undefined)) &&
+            <button
+              type="button"
+              className={styles.born}
+              onClick={handleOpenTableCalf}
+              title="Mostrar crias"
+            >
+              <GiCow />
+              <span>|</span>
               Bezerros
           </button>
-        }
+          }
 
 
-      </div>
-
-      {
-        <div className={
-          isOpenTableOrdenha ||
-            isOpenTableWeight ||
-            isOpenTableCoverage ||
-            isOpenTableCalf ?
-            `${styles.visible} ${styles.tableContainer}` :
-            `${styles.hidden}  ${styles.tableContainer}`}
-        >
-          {
-            isOpenTableOrdenha &&
-            <div ref={milkingRef}>
-              <TableOrdenha cow={cow} />
-            </div>
-          }
-          {
-            isOpenTableWeight &&
-            <div ref={weightRef}>
-              <TableWeight cow={cow} />
-            </div>
-          }
-          {
-            isOpenTableCoverage &&
-            <div ref={coverageRef}>
-              <TableCoverage cow={cow} />
-            </div>
-          }
-          {
-            isOpenTableCalf &&
-            <div ref={calfRef}>
-              <TableCalf cow={cow} />
-            </div>
-          }
         </div>
-      }
 
-
-
-
-    </div>
+        {
+          <div className={
+            isOpenTableOrdenha ||
+              isOpenTableWeight ||
+              isOpenTableCoverage ||
+              isOpenTableCalf ?
+              `${styles.visible} ${styles.tableContainer}` :
+              `${styles.hidden}  ${styles.tableContainer}`}
+          >
+            {
+              isOpenTableOrdenha &&
+              <div ref={milkingRef}>
+                <TableOrdenha cow={cow} />
+              </div>
+            }
+            {
+              isOpenTableWeight &&
+              <div ref={weightRef}>
+                <TableWeight cow={cow} />
+              </div>
+            }
+            {
+              isOpenTableCoverage &&
+              <div ref={coverageRef}>
+                <TableCoverage cow={cow} />
+              </div>
+            }
+            {
+              isOpenTableCalf &&
+              <div ref={calfRef}>
+                <TableCalf cow={cow} />
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </>
   )
 }
 
-// export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-//   const { id } = params
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  const { id } = params
 
+  const data = await fetcher(`/vacas/${id}`)
+
+  async function getCoverages(coverages: CowCoveragesProps[]) {
+    const arrayOfPromisses = coverages.map(async (cowCoverage: CowCoveragesProps) => {
+      const response = await api.get(`coberturas/${cowCoverage.id}`)
+      return response.data
+    })
+    return await Promise.all(arrayOfPromisses)
+  }
+
+  const cow = {
+    id,
+    name: data.name,
+    born: moment(data.born).format('DD/MM/YYYY'),
+    age: moment(Date.now()).diff(data.born, 'months'),
+    image: data?.image?.url === undefined ? '' : data.image.url,
+    weights: data?.weights?.sort((a: CowWeightProps, b: CowWeightProps) => (a.id > b.id) ? -1 : 1),
+    coverages: await getCoverages(data.coverages.sort((a: CowCoveragesProps, b: CowCoveragesProps) => (a.id > b.id) ? -1 : 1)),
+    milkings: data.milkings.map((milking: MilkingProps) => {
+      return {
+        ...milking,
+        total: (milking.firstMilking + milking.secondMilking),
+      }
+    })
+  }
+
+  return {
+    props: {
+      cow,
+    },
+  }
+}
+
+// export const getStaticPaths: GetStaticPaths = async () => {
+//   const res = await api.get(`vacas`)
+
+//   const cows = res.data
+
+//   const paths = cows.map((cow: ICow) => ({
+//     params: { id: cow.id.toString() }
+//   }))
+
+//   return {
+//     paths,
+//     fallback: true
+//   }
+// }
+
+// export const getStaticProps: GetStaticProps = async (context) => {
+//   const { id } = context.params
 //   const response = await api.get(`vacas/${id}`)
+
+//   // const cow: ICow = response.data
 
 //   async function getCoverages(coverages: CowCoveragesProps[]) {
 //     const arrayOfPromisses = coverages.map(async (cowCoverage: CowCoveragesProps) => {
@@ -354,12 +407,12 @@ export default function AnimalRegister({ cow }: CowProps) {
 //     return await Promise.all(arrayOfPromisses)
 //   }
 
-//   const cow = {
-//     id,
+//   const cow: ICow = {
+//     id: Number(id),
 //     name: response.data.name,
 //     born: moment(response.data.born).format('DD/MM/YYYY'),
 //     age: moment(Date.now()).diff(response.data.born, 'months'),
-//     image: response.data.image ? response.data.image?.url : '',
+//     image: response.data?.image?.url === undefined ? '' : response.data.image.url,
 //     weights: response.data?.weights?.sort((a: CowWeightProps, b: CowWeightProps) => (a.id > b.id) ? -1 : 1),
 //     coverages: await getCoverages(response.data.coverages.sort((a: CowCoveragesProps, b: CowCoveragesProps) => (a.id > b.id) ? -1 : 1)),
 //     milkings: response.data.milkings.map((milking: MilkingProps) => {
@@ -372,62 +425,8 @@ export default function AnimalRegister({ cow }: CowProps) {
 
 //   return {
 //     props: {
-//       cow,
+//       cow
 //     },
+//     revalidate: 60
 //   }
 // }
-
-export const getStaticPaths: GetStaticPaths = async() => {
-  const res = await api.get(`vacas`)
-
-  const cows = res.data
-
-  const paths = cows.map((cow: ICow) => ({
-    params: { id: cow.id.toString() }
-  }))
-
-  return {
-    paths,
-    fallback: true
-  }
-}
-
-export const getStaticProps: GetStaticProps = async(context) => {
-  const { id } = context.params
-  const response = await api.get(`vacas/${id}`)
-
-  // const cow: ICow = response.data
-
-  async function getCoverages(coverages: CowCoveragesProps[]) {
-    const arrayOfPromisses = coverages.map(async (cowCoverage: CowCoveragesProps) => {
-      const response = await api.get(`coberturas/${cowCoverage.id}`)
-      return response.data
-    })
-    return await Promise.all(arrayOfPromisses)
-  }
-
-  const cow: ICow = {
-    id: Number(id),
-    name: response.data.name,
-    born: moment(response.data.born).format('DD/MM/YYYY'),
-    age: moment(Date.now()).diff(response.data.born, 'months'),
-    image: response.data?.image?.url === undefined ? '' : response.data.image.url,
-    weights: response.data?.weights?.sort((a: CowWeightProps, b: CowWeightProps) => (a.id > b.id) ? -1 : 1),
-    coverages: await getCoverages(response.data.coverages.sort((a: CowCoveragesProps, b: CowCoveragesProps) => (a.id > b.id) ? -1 : 1)),
-    milkings: response.data.milkings.map((milking: MilkingProps) => {
-      return {
-        ...milking,
-        total: (milking.firstMilking + milking.secondMilking),
-      }
-    })
-  }
-
-  console.log(cow)
-  
-  return {
-    props: {
-      cow
-    },
-    revalidate: 60
-  }
-}
