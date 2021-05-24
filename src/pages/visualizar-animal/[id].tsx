@@ -64,7 +64,11 @@ export default function AnimalDetails({ cow }: CowProps) {
   const { isFallback } = useRouter()
 
   if (isFallback) {
-    return <p>Carregando</p>
+    return (
+      <div style={{ flex: 1 }}>
+        <p>Carregando...</p>
+      </div>
+    )
   }
 
   const lactationPeriod = 305 //dias
