@@ -40,36 +40,83 @@ const AnimalSchema = Yup.object().shape({
   born: Yup.date().required('Data de nascimento é obrigatória'),
 })
 
+const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalEdit({ cow }: CowProps) {
+export default function AnimalEdit({cow}) {
   const [selectedFile, setSelectedFile] = useState(null)
+  
+
+
+  if (!cow) {
+    return (
+      <div style={{flex: 1}}>
+        <p>Carregando...</p>
+      </div>
+    )
+  }
+
 
   const imageUploaded = async function(file) {
-    try {   
-      if (!file) {
-        return
+    if (!file) {
+      return
+    }
+    
+    const uploadData = new FormData()
+    uploadData.append('files', file)
+
+
+    const uploadRes = await axios({
+      method: 'POST',
+      url: `${process.env.NEXT_PUBLIC_API_URL}/upload`,
+      data: uploadData
+    })
+
+
+    return uploadRes.data[0]
+  }
+  
+  
+  async function onSubmit(values, actions) {
+    try {
+      const data = {
+        name: values.name,
+        born: moment(values.born).format('YYYY-MM-DD'),
+        // image: await imageUploaded(selectedFile)
       }
+
+      const response = await api.put(`vacas/${cow.id}`, data)
       
-      const uploadData = new FormData()
-      uploadData.append('files', file)
+      if (response.status === 200) {
+        const dataWeight = {
+          vacaId: response.data.id,
+          weight: values.weight,
+          date: moment(Date.now()).format('YYYY-MM-DD')
+        }
+        
+        await api.put(`pesos/${cow.weight.id}`, dataWeight)
+        
+        toast.success('Editado com sucesso')
+        router.push('/listar-animais')
 
-      const uploadRes = await axios({
-        method: 'POST',
-        url: `${process.env.API_URL}upload`,
-        data: uploadData
-      })
-
-      if (uploadRes.status !== 200) {
-        toast.error('Erro ao fazer upload da Imagem')
+        if (selectedFile) {
+          const imageResponse = await api.put(`/vacas/${cow.id}`, {
+            image: await imageUploaded(selectedFile)
+          })
+          if ((!imageResponse) || (imageResponse.status !== 200)) {
+            toast.error(`Erro ao adicionar imagem da Vaca ${response.data.name}.
+            \nContate o administrador`)
+          }
+        }
       }
-      return uploadRes.data[0]
+      else {
+      }
     } catch (error) {
       console.error(error)
-      toast.error('Erro ao adicionar imagem.')
+      toast.error('Erro inesperado.')
       router.push(`/`)
     }
   }
-
+  
   async function handleDelete() {
     const confirmMessage = confirm(`Deseja remover ${cow.name} ?`)
 
@@ -85,40 +132,6 @@ export default function AnimalEdit({ cow }: CowProps) {
     }
   }
 
-  async function onSubmit(values, actions) {
-    try {
-      const data = {
-        uid: values.name.toLocaleLowerCase(),
-        Name: values.name,
-        Born: moment(values.born).format('YYYY-MM-DD'),
-        childBirth: values.childbirth ? moment(values.childbirth).format('YYYY-MM-DD') : null,
-        image: await imageUploaded(selectedFile)
-      }
-
-      const response = await api.put(`vacas/${cow.id}`, data)
-
-      if (response.status === 200) {
-        const dataWeight = {
-          vacaId: response.data.id,
-          weight: values.weight,
-        }
-
-        await api.put(`pesos/${cow.weightId}`, dataWeight)
-
-        toast.success('Editado com sucesso')
-        router.push('/listar-animais')
-      }
-      else {
-        toast.error('Erro ao adicionar.')
-      }
-    } catch (error) {
-      console.error(error)
-      toast.error('Erro inesperado.')
-      router.push(`/`)
-    }
-  }
-
-
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -129,8 +142,7 @@ export default function AnimalEdit({ cow }: CowProps) {
       <Formik
         initialValues={{
           name: cow.name,
-          weightId: cow.weightId,
-          weight: cow.weight,
+          weight: cow.weight.weight,
           born: moment(cow.born).format('YYYY-MM-DD'),
           image: cow.image
         }}
@@ -168,7 +180,7 @@ export default function AnimalEdit({ cow }: CowProps) {
             {
               cow.image && cow.image !== null &&
               <Image 
-                src={`${process.env.NEXT_PUBLIC_API_URL}${cow.image}`} 
+                src={`${cow.image}`} 
                 alt={cow.name}
                 layout="intrinsic"
                 objectFit="cover"
@@ -200,26 +212,15 @@ export default function AnimalEdit({ cow }: CowProps) {
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const { id } = params
 
-  const response = await api.get(`vacas/${id}`)
-  
+  const data = await fetcher(`/vacas/${id}`)
+
   const cow = {
     id,
-    name: response.data.name,
-    weightId: response.data.weights.sort((a, b) => (a.id > b.id) ? -1 : 1)[0]?.id,
-    weight: response.data.weights.sort((a, b) => (a.id > b.id) ? -1 : 1)[0]?.weight,
-    born: moment(response.data.born).format('YYYY-MM-DD'),
-    childbirth: moment(response.data.childBirth).format('YYYY-MM-DD'),
-    // image: Object.entries(response.data.image).length !== 0 ? response.data.image?.url : '',
-    image:response.data.image ? response.data.image?.url : '',
-    milkings: response.data.milkings.map((milking: MilkingProps) => {
-      return {
-        ...milking,
-        firstMilking: milking.firstMilking.toLocaleString('pt-BR'),
-        secondMilking: milking.secondMilking.toLocaleString('pt-BR'),
-        total: (milking.firstMilking + milking.secondMilking).toLocaleString('pt-BR'),
-        formattedDate: new Intl.DateTimeFormat('pt-BR').format(new Date(milking.date))
-      }
-    })
+    name: data.name,
+    born: moment(data.born).format('YYYY-MM-DD'),
+    image: data?.image?.url === undefined ? '' : data.image.url,
+    weight: data.weights.sort((a, b) => (a.id > b.id) ? -1 : 1)?.[0],
+
   }
 
   return {

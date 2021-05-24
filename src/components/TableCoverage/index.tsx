@@ -32,7 +32,7 @@ const TableCoverage = ({ cow }: CowProps) => {
 
   const [coverageModalEditOpen, setCoverageModalEditOpen] = useState(false)
   const [coverageEdit, setCoverageEdit] = useState({})
-  
+
   const [calfModalOpen, setCalfModalOpen] = useState(false)
   const [creatingCalf, setCreatingCalf] = useState({})
 
@@ -80,82 +80,82 @@ const TableCoverage = ({ cow }: CowProps) => {
 
   return (
     <div className={styles.wrapper}>
-    <table>
-      <thead>
-        <tr>
-          <th>Tipo</th>
-          <th>Data da Cobertura</th>
-          <th>Nascimento Previsto</th>
-          <th>Bezerro</th>
-          <th className={styles.buttonAddContent}>
-              <button
-                type="button"
-                title="Cadastrar cobertura"
-                onClick={handleCreateCoverage}
-              >
-                <div className={styles.add}>
-                  <span>+</span>
-                  <span>Cobertura</span>
-                </div>
-              </button>
-            </th>
-        </tr>
-      </thead>
-      <tbody>
-        {cow.coverages.map((cowCoverage: CowCoveragesProps) => {
-          return (
-            <tr key={cowCoverage.id}>
-              {
-                cowCoverage.semen ? <td>Inseminação</td> : <td>Touro</td>
-              }
-              <td>{moment(cowCoverage.coverageDate).format('DD/MM/YYYY')}</td>
-              <td>{moment(cowCoverage.birthEstimate).format('DD/MM/YYYY')}</td>
-              {
-                cowCoverage.cria ?
-                <td>{cowCoverage.cria.name}</td> :
-                <td>
-                  <button 
-                    type="button"
-                    onClick={handleCreateCalf}
-                    title="Registrar cria"
-                    className={styles.addCalf}
-                  >
-                    <span>
-                      Cadastrar Cria
+      <div className={styles.buttonAddContent}>
+        <button
+          type="button"
+          title="Cadastrar cobertura"
+          onClick={handleCreateCoverage}
+        >
+          <div className={styles.add}>
+            <span>+</span>
+            <span>Cobertura</span>
+          </div>
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Data da Cobertura</th>
+            <th>Nascimento Previsto</th>
+            <th>Bezerro</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cow.coverages.map((cowCoverage: CowCoveragesProps) => {
+            return (
+              <tr key={cowCoverage.id}>
+                {
+                  cowCoverage.semen ? <td>Inseminação</td> : <td>Touro</td>
+                }
+                <td>{moment(cowCoverage.coverageDate).format('DD/MM/YYYY')}</td>
+                <td>{moment(cowCoverage.birthEstimate).format('DD/MM/YYYY')}</td>
+                {
+                  cowCoverage.cria ?
+                    <td>{cowCoverage.cria.name}</td> :
+                    <td>
+                      <button
+                        type="button"
+                        onClick={handleCreateCalf}
+                        title="Registrar cria"
+                        className={styles.addCalf}
+                      >
+                        <span>
+                          Cadastrar Cria
                     </span>
-                  </button>
+                      </button>
+                    </td>
+                }
+                <td
+                  onClick={() => handleEditCoverage(cowCoverage)}
+                  title="Editar Cobertura"
+                >
+                  <FaEdit />
                 </td>
-              }
-              <td
-                onClick={() => handleEditCoverage(cowCoverage)} 
-                title="Editar Cobertura"
-              >
-                <FaEdit />
-              </td>
-            </tr>
-          )
-        })}
-      </tbody>
-    </table>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
 
-    <ModalCreateCobertura
-      isOpen={coverageModalOpen}
-      setIsOpen={toggleCoverageModal}
-      creatingCoverage={creatingCoverage}
-    />
+      <ModalCreateCobertura
+        isOpen={coverageModalOpen}
+        setIsOpen={toggleCoverageModal}
+        creatingCoverage={creatingCoverage}
+      />
 
-    <ModalEditCobertura
-      isOpen={coverageModalEditOpen}
-      setIsOpen={toggleCoverageModalEdit}
-      coverageEdit={coverageEdit}
-    />
+      <ModalEditCobertura
+        isOpen={coverageModalEditOpen}
+        setIsOpen={toggleCoverageModalEdit}
+        coverageEdit={coverageEdit}
+      />
 
-    <ModalCreateCria
-      isOpen={calfModalOpen}
-      setIsOpen={toggleCalfModal}
-      creatingCalf={creatingCalf}
-    />   
-     
+      <ModalCreateCria
+        isOpen={calfModalOpen}
+        setIsOpen={toggleCalfModal}
+        creatingCalf={creatingCalf}
+      />
+
     </div>
   )
 }

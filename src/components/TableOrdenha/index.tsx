@@ -56,6 +56,18 @@ const TableOrdenha = ({ cow }: CowProps) => {
 
   return (
     <div className={styles.wrapper} >
+      <div className={styles.buttonAddContent}>
+        <button
+          type="button"
+          title="Cadastrar Ordenha"
+          onClick={handleCreateMilking}
+        >
+          <div className={styles.add}>
+            <span>+</span>
+            <span>Ordenha</span>
+          </div>
+        </button>
+      </div>
       <table>
         <thead>
           <tr>
@@ -63,18 +75,6 @@ const TableOrdenha = ({ cow }: CowProps) => {
             <th>2a Ordenha</th>
             <th>Total Ordenha</th>
             <th>Data</th>
-            <th className={styles.buttonAddContent}>
-              <button
-                type="button"
-                title="Cadastrar Ordenha"
-                onClick={handleCreateMilking}
-              >
-                <div className={styles.add}>
-                  <span>+</span>
-                  <span>Ordenha</span>
-                </div>
-              </button>
-            </th>
           </tr>
         </thead>
         <tbody>
