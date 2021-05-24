@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Field, Form, Formik } from 'formik';
 import moment from 'moment';
-import { GetServerSideProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import Image from 'next/image';
 import router from 'next/router';
 import React, { useState } from "react";
@@ -17,21 +17,41 @@ type MilkingProps = {
   firstMilking: number,
   secondMilking: number,
   total: number,
-  date: string,
+  date: Date,
   formattedDate: string
 }
 
-interface CowProps {
-  cow: {
-    id: number;
+type CowCoveragesProps = {
+  id: number;
+  coverageDate: Date;
+  birthEstimate: Date;
+  semen: boolean;
+  bull: boolean;
+  cria: {
     name: string;
-    weightId: number;
-    weight: number;
-    born: string;
-    childbirth: string;
-    image: string;
-    milkings: MilkingProps[];
+    birthDate: Date;
   }
+}
+
+type CowWeightProps = {
+  id: number;
+  weight: number;
+  date: Date;
+}
+
+type ICow = {
+  id: number;
+  name: string;
+  born: string;
+  image: string;
+  age: number;
+  milkings: MilkingProps[];
+  coverages: CowCoveragesProps[];
+  weights: CowWeightProps[];
+}
+
+interface CowProps {
+  cow: ICow;
 }
 
 const AnimalSchema = Yup.object().shape({
@@ -209,7 +229,20 @@ export default function AnimalEdit({cow}) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  const cows = await fetcher(`/vacas`)
+
+  const paths = cows.map((cow: ICow) => ({
+    params: { id: cow.id.toString() }
+  }))
+
+  return {
+    paths,
+    fallback: true
+  }
+}
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { id } = params
 
   const data = await fetcher(`/vacas/${id}`)
