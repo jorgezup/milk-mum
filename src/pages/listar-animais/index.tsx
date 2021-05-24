@@ -1,4 +1,5 @@
 import moment from 'moment'
+import Head from 'next/head'
 import Link from 'next/link'
 import React from 'react'
 import { GiCow } from 'react-icons/gi'
@@ -34,111 +35,89 @@ const fetcher = (url: string) => api.get(url).then(res => res.data)
 
 export default function AnimalList(props) {
   const initialData = props.cows
-  const { data: cows, error } = useSWR(`/vacas`, fetcher, { initialData})
+  const { data: cows, error } = useSWR(`/vacas`, fetcher, { initialData })
 
 
   if (!cows) {
     return (
-      <div style={{flex: 1}}>
+      <div style={{ flex: 1 }}>
         <p>Carregando...</p>
       </div>
     )
   }
 
-  // const [cows, setCows] = useState<ICow[]>([])
-
-  // useEffect(() => {
-  //   async function getCows() {
-  //     const response = await api.get('vacas')
-  //     const cowData = response.data.map((cow: ICow) => {
-  //       return {
-  //         ...cow,
-  //         weights: cow?.weights?.sort((a:IWeight, b:IWeight) => (a.id > b.id) ? -1 : 1),
-  //         milkings: cow?.milkings?.sort((a:IMilking, b:IMilking) => (a.id > b.id) ? -1 : 1),
-  //       }
-  //     })
-  //     setCows(cowData)
-  //   }
-  //   getCows()
-  // }, [])
-
-  // const handleViewCow = (cow) => {
-  //   // AnimalRegister(cow.id)
-  //   router.push(`visualizar-animal/${cow.id}`)
-  // }
-
-  // const { isFallback } = useRouter()
-
-  // if (isFallback) {
-  //   return <p>Carregando</p>
-  // }
-
   return (
-    <div className={styles.container}>
-      <header>
-        <Link href="/cadastrar-animal">
-          <button title="Cadastrar Vaca">
-            <span>Cadastrar Vaca</span>
-            <span>|</span>
-            <GiCow />
-          </button>
-        </Link>
-      </header>
-      <table>
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Peso</th>
-            <th>1a ordenha</th>
-            <th>2a ordenha</th>
-            <th>Data</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cows.map((cow: ICow) => (
-            <Link
-              key={cow?.id}
-              href={`visualizar-animal/${cow.id}`}
-            >
-              <tr
-                key={cow.id}
-                title="Visualizar animal"
+    <>
+      <Head>
+        <title>Listagem dos Animais</title>
+      </Head>
+      <div className={styles.container}>
+        <header>
+          <Link href="/cadastrar-animal">
+            <button title="Cadastrar Vaca">
+              <span>Cadastrar Vaca</span>
+              <span>|</span>
+              <GiCow />
+            </button>
+          </Link>
+        </header>
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Peso</th>
+              <th>1a ordenha</th>
+              <th>2a ordenha</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cows.map((cow: ICow) => (
+              <Link
+                key={cow?.id}
+                href={`visualizar-animal/${cow.id}`}
               >
-                <td>{cow?.name}</td>
-                {
-                  cow.weights?.[0]?.weight
-                    ? <td>{cow.weights?.[0]?.weight} kg</td>
-                    : <td></td>
-                }
-                {
-                    cow.milkings[0]?.firstMilking
-                    ? <td>{(cow.milkings?.[0]?.firstMilking).toLocaleString('pt-BR')} kg</td>
-                    : <td></td>
-                }
-                {
-                    cow.milkings[0]?.secondMilking
-                    ? <td>{(cow.milkings?.[0]?.secondMilking).toLocaleString('pt-BR')} kg</td>
-                    : <td></td>
-                }
-                <td>
+                <tr
+                  key={cow.id}
+                  title="Visualizar animal"
+                >
+                  <td>{cow?.name}</td>
                   {
-                    cow.milkings?.[0]
-                      ? moment(cow.milkings?.[0].date).format('DD/MM/YYYY')
-                      : moment(cow.weights?.[0].date).format('DD/MM/YYYY')
+                    cow.weights?.[0]?.weight
+                      ? <td>{cow.weights?.[0]?.weight} kg</td>
+                      : <td></td>
                   }
-                </td>
-              </tr>
-            </Link>
-          ))}
-        </tbody>
-      </table>
-    </div>
+                  {
+                    cow.milkings[0]?.firstMilking
+                      ? <td>{(cow.milkings?.[0]?.firstMilking).toLocaleString('pt-BR')} kg</td>
+                      : <td></td>
+                  }
+                  {
+                    cow.milkings[0]?.secondMilking
+                      ? <td>{(cow.milkings?.[0]?.secondMilking).toLocaleString('pt-BR')} kg</td>
+                      : <td></td>
+                  }
+                  <td>
+                    {
+                      cow.milkings?.[0]
+                        ? moment(cow.milkings?.[0].date).format('DD/MM/YYYY')
+                        : moment(cow.weights?.[0].date).format('DD/MM/YYYY')
+                    }
+                  </td>
+                </tr>
+              </Link>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+
   )
 }
 
-export const getStaticProps = async() => {
+export const getStaticProps = async () => {
   const cows: ICow[] = await fetcher(`/vacas`)
-  
+
   return {
     props: {
       cows
