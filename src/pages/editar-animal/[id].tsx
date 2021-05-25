@@ -2,10 +2,12 @@ import axios from 'axios';
 import { Field, Form, Formik } from 'formik';
 import moment from 'moment';
 import { GetStaticPaths, GetStaticProps } from 'next';
+import Head from 'next/head';
 import Image from 'next/image';
 import router from 'next/router';
 import React, { useState } from "react";
 import { toast } from 'react-toastify';
+import { mutate } from 'swr';
 import * as Yup from 'yup';
 import { BackButton } from '../../components/BackButton';
 import { InputFile } from '../../components/InputFile';
@@ -62,25 +64,25 @@ const AnimalSchema = Yup.object().shape({
 
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalEdit({cow}) {
+export default function AnimalEdit({ cow }) {
   const [selectedFile, setSelectedFile] = useState(null)
-  
+
 
 
   if (!cow) {
     return (
-      <div style={{flex: 1}}>
+      <div style={{ flex: 1 }}>
         <p>Carregando...</p>
       </div>
     )
   }
 
 
-  const imageUploaded = async function(file) {
+  const imageUploaded = async function (file) {
     if (!file) {
       return
     }
-    
+
     const uploadData = new FormData()
     uploadData.append('files', file)
 
@@ -94,8 +96,8 @@ export default function AnimalEdit({cow}) {
 
     return uploadRes.data[0]
   }
-  
-  
+
+
   async function onSubmit(values, actions) {
     try {
       const data = {
@@ -104,17 +106,23 @@ export default function AnimalEdit({cow}) {
         // image: await imageUploaded(selectedFile)
       }
 
+      mutate(`vacas/${cow.id}`, data, false)
+
       const response = await api.put(`vacas/${cow.id}`, data)
-      
+
       if (response.status === 200) {
         const dataWeight = {
           vacaId: response.data.id,
           weight: values.weight,
           date: moment(Date.now()).format('YYYY-MM-DD')
         }
-        
+
+        mutate(`pesos/${cow.weight.id}`, dataWeight, false)
+
         await api.put(`pesos/${cow.weight.id}`, dataWeight)
-        
+
+        mutate(`vacas/${cow.id}`)
+
         toast.success('Editado com sucesso')
         router.push('/listar-animais')
 
@@ -136,96 +144,98 @@ export default function AnimalEdit({cow}) {
       router.push(`/`)
     }
   }
-  
+
   async function handleDelete() {
     const confirmMessage = confirm(`Deseja remover ${cow.name} ?`)
 
     if (confirmMessage) {
       const response = await api.delete(`vacas/${cow.id}`)
-    
+
       if (response.status !== 200) {
         toast.error('Erro ao deletar animal')
       }
-  
+
       toast.success('Animal removido')
       router.push('/listar-animais')
     }
   }
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h2>Editar Animal</h2>
-        <BackButton />
-      </header>
+    <>
+      <Head>
+        <title>{cow.name} | MilkMum</title>
+      </Head>
+      <div className={styles.container}>
+        <header className={styles.header}>
+          <h2>Editar Animal</h2>
+          <BackButton />
+        </header>
 
-      <Formik
-        initialValues={{
-          name: cow.name,
-          weight: cow.weight.weight,
-          born: moment(cow.born).format('YYYY-MM-DD'),
-          image: cow.image
-        }}
-        validationSchema={AnimalSchema}
-        onSubmit={onSubmit}
-      >
-        {({ errors, touched }) => (
-          <Form className={styles.form}>
-            <label htmlFor="">Nome</label>
-            <Field name="name" type="text"/>
-            {errors.name && touched.name ? (
-              <div className={styles.message}>
-                {errors.name}
-              </div>
-            ) : null}
+        <Formik
+          initialValues={{
+            name: cow.name,
+            weight: cow.weight.weight,
+            born: moment(cow.born).format('YYYY-MM-DD'),
+            image: cow.image
+          }}
+          validationSchema={AnimalSchema}
+          onSubmit={onSubmit}
+        >
+          {({ errors, touched }) => (
+            <Form className={styles.form}>
+              <label htmlFor="">Nome</label>
+              <Field name="name" type="text" />
+              {errors.name && touched.name ? (
+                <div className={styles.message}>
+                  {errors.name}
+                </div>
+              ) : null}
 
-            <label htmlFor="">Peso</label>
-            <Field name="weight" type="number"/>
-            {errors.weight && touched.weight ? (
-              <div className={styles.message}>
-                {errors.weight}
-              </div>
-            ) : null}
+              <label htmlFor="">Peso</label>
+              <Field name="weight" type="number" />
+              {errors.weight && touched.weight ? (
+                <div className={styles.message}>
+                  {errors.weight}
+                </div>
+              ) : null}
 
-            <label htmlFor="">Nascimento</label>
-            <Field name="born" type="date"/>
-            {errors.born && touched.born ? (
-              <div className={styles.message}>
-                {errors.born}
-              </div>
-            ) : null}
+              <label htmlFor="">Nascimento</label>
+              <Field name="born" type="date" />
+              {errors.born && touched.born ? (
+                <div className={styles.message}>
+                  {errors.born}
+                </div>
+              ) : null}
 
-            <label htmlFor="">Foto</label>
+              <label htmlFor="">Foto</label>
 
-            {
-              cow.image && cow.image !== null &&
-              <Image 
-                src={`${cow.image}`} 
-                alt={cow.name}
-                layout="intrinsic"
-                objectFit="cover"
-                width={300}
-                height={220}
-                priority={true} 
+              {
+                cow.image && cow.image !== null &&
+                <Image
+                  src={`${cow.image}`}
+                  alt={cow.name}
+                  layout="intrinsic"
+                  objectFit="cover"
+                  width={300}
+                  height={220}
+                  priority={true}
+                />
+              }
+
+              <InputFile
+                onFileSelectSuccess={(file) => setSelectedFile(file)}
+                onFileSelectError={({ error }) => alert(error)}
               />
-            }
 
-            <InputFile 
-              onFileSelectSuccess={(file) => setSelectedFile(file)}
-              onFileSelectError={({error}) => alert(error)}
-            />
-
-            <div className={styles.buttons}>
-              <button type="button" className={styles.delete} onClick={handleDelete}>Deletar</button>
-              <button type="submit" className={styles.confirm}>Editar</button>
-            </div>            
-          </Form>
-        )}
-      </Formik>
-
-
-  
-    </div>
+              <div className={styles.buttons}>
+                <button type="button" className={styles.delete} onClick={handleDelete}>Deletar</button>
+                <button type="submit" className={styles.confirm}>Editar</button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </div>
+    </>
   )
 }
 

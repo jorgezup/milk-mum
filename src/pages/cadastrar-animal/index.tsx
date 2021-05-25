@@ -14,7 +14,6 @@ export default function AnimalRegister() {
   const [selectedFile, setSelectedFile] = useState(null)
 
   const imageUploaded = async function(file) {
-    
       if (!file) {
         return
       }
@@ -28,11 +27,7 @@ export default function AnimalRegister() {
         data: uploadData
       })
       
-      // if (uploadRes.status !== 200) {
-      //   toast.error('Erro ao fazer upload da Imagem')
-      // }
       return uploadRes.data[0]
-    
   }
     
   

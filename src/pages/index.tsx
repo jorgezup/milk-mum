@@ -1,9 +1,12 @@
 import Head from 'next/head';
 import Image from 'next/image';
 import React from 'react';
+import startBackend from '../utils/startBackend';
 import styles from './home.module.scss';
 
 export default function Home() {
+  startBackend() 
+
   return (
     <>
       <Head>

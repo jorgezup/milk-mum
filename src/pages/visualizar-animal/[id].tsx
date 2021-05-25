@@ -123,8 +123,8 @@ export default function AnimalDetails({ cow }: CowProps) {
 
   return (
     <>
-      <Head>
-        <title>{cow.name}</title>
+      <Head> 
+        <title>{cow.name} | MilkMum</title>
       </Head>
       <div className={styles.container}>
         <header className={styles.header}>
