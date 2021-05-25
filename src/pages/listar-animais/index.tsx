@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import React from 'react'
@@ -112,22 +113,22 @@ export default function AnimalList(props) {
   )
 }
 
-export const getStaticProps = async () => {
-  const cows: ICow[] = await fetcher(`/vacas`)
-
-  return {
-    props: {
-      cows
-    }
-  }
-}
-
-// export const getServerSideProps: GetServerSideProps = async() => {
+// export const getStaticProps = async () => {
 //   const cows: ICow[] = await fetcher(`/vacas`)
-//   // const {data: cows} = useFetch('/vacas')
-//   return { 
+
+//   return {
 //     props: {
 //       cows
 //     }
 //   }
 // }
+
+export const getServerSideProps: GetServerSideProps = async() => {
+  const cows: ICow[] = await fetcher(`/vacas`)
+
+  return { 
+    props: {
+      cows
+    }
+  }
+}
