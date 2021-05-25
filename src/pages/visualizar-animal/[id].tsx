@@ -1,5 +1,5 @@
 import moment from "moment";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from 'next/image';
 import Link from "next/link";
@@ -345,60 +345,10 @@ export default function AnimalDetails({cow}) {
   )
 }
 
-// export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-//   const { id } = params
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  const { id } = params
 
-//   const data = await fetcher(`/vacas/${id}`)
-
-//   async function getCoverages(coverages: CowCoveragesProps[]) {
-//     const arrayOfPromisses = coverages.map(async (cowCoverage: CowCoveragesProps) => {
-//       const response = await api.get(`coberturas/${cowCoverage.id}`)
-//       return response.data
-//     })
-//     return await Promise.all(arrayOfPromisses)
-//   }
-
-//   const cow = {
-//     id,
-//     name: data.name,
-//     born: moment(data.born).format('DD/MM/YYYY'),
-//     age: moment(Date.now()).diff(data.born, 'months'),
-//     image: data?.image?.url === undefined ? '' : data.image.url,
-//     weights: data?.weights?.sort((a: CowWeightProps, b: CowWeightProps) => (a.id > b.id) ? -1 : 1),
-//     coverages: await getCoverages(data.coverages.sort((a: CowCoveragesProps, b: CowCoveragesProps) => (a.id > b.id) ? -1 : 1)),
-//     milkings: data.milkings.map((milking: MilkingProps) => {
-//       return {
-//         ...milking,
-//         total: (milking.firstMilking + milking.secondMilking),
-//       }
-//     })
-//   }
-
-//   return {
-//     props: {
-//       cow,
-//     },
-//   }
-// }
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  const cows = await fetcher(`/vacas`)
-
-  const paths = cows.map((cow: ICow) => ({
-    params: { id: cow.id.toString() }
-  }))
-
-  return {
-    paths,
-    fallback: true,
-  }
-}
-
-export const getStaticProps: GetStaticProps = async (context) => {
-  const { id } = context.params
-  
   const data = await fetcher(`/vacas/${id}`)
-
 
   async function getCoverages(coverages: CowCoveragesProps[]) {
     const arrayOfPromisses = coverages.map(async (cowCoverage: CowCoveragesProps) => {
@@ -408,8 +358,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
     return await Promise.all(arrayOfPromisses)
   }
 
-  const cow: ICow = {
-    id: Number(id),
+  const cow = {
+    id,
     name: data.name,
     born: moment(data.born).format('DD/MM/YYYY'),
     age: moment(Date.now()).diff(data.born, 'months'),
@@ -426,7 +376,57 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   return {
     props: {
-      cow
-    }
+      cow,
+    },
   }
 }
+
+// export const getStaticPaths: GetStaticPaths = async () => {
+//   const cows = await fetcher(`/vacas`)
+
+//   const paths = cows.map((cow: ICow) => ({
+//     params: { id: cow.id.toString() }
+//   }))
+
+//   return {
+//     paths,
+//     fallback: true,
+//   }
+// }
+
+// export const getStaticProps: GetStaticProps = async (context) => {
+//   const { id } = context.params
+  
+//   const data = await fetcher(`/vacas/${id}`)
+
+
+//   async function getCoverages(coverages: CowCoveragesProps[]) {
+//     const arrayOfPromisses = coverages.map(async (cowCoverage: CowCoveragesProps) => {
+//       const response = await api.get(`coberturas/${cowCoverage.id}`)
+//       return response.data
+//     })
+//     return await Promise.all(arrayOfPromisses)
+//   }
+
+//   const cow: ICow = {
+//     id: Number(id),
+//     name: data.name,
+//     born: moment(data.born).format('DD/MM/YYYY'),
+//     age: moment(Date.now()).diff(data.born, 'months'),
+//     image: data?.image?.url === undefined ? '' : data.image.url,
+//     weights: data?.weights?.sort((a: CowWeightProps, b: CowWeightProps) => (a.id > b.id) ? -1 : 1),
+//     coverages: await getCoverages(data.coverages.sort((a: CowCoveragesProps, b: CowCoveragesProps) => (a.id > b.id) ? -1 : 1)),
+//     milkings: data.milkings.map((milking: MilkingProps) => {
+//       return {
+//         ...milking,
+//         total: (milking.firstMilking + milking.secondMilking),
+//       }
+//     })
+//   }
+
+//   return {
+//     props: {
+//       cow
+//     }
+//   }
+// }

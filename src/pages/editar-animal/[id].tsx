@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Field, Form, Formik } from 'formik';
 import moment from 'moment';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import router from 'next/router';
@@ -237,20 +237,7 @@ export default function AnimalEdit({cow}) {
   )
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const cows = await fetcher(`/vacas`)
-
-  const paths = cows.map((cow: ICow) => ({
-    params: { id: cow.id.toString() }
-  }))
-
-  return {
-    paths,
-    fallback: true
-  }
-}
-
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const { id } = params
 
   const data = await fetcher(`/vacas/${id}`)
@@ -261,7 +248,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     born: moment(data.born).format('YYYY-MM-DD'),
     image: data?.image?.url === undefined ? '' : data.image.url,
     weight: data.weights.sort((a, b) => (a.id > b.id) ? -1 : 1)?.[0],
-
   }
 
   return {
@@ -270,3 +256,37 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     },
   }
 }
+
+// export const getStaticPaths: GetStaticPaths = async () => {
+//   const cows = await fetcher(`/vacas`)
+
+//   const paths = cows.map((cow: ICow) => ({
+//     params: { id: cow.id.toString() }
+//   }))
+
+//   return {
+//     paths,
+//     fallback: true
+//   }
+// }
+
+// export const getStaticProps: GetStaticProps = async ({ params }) => {
+//   const { id } = params
+
+//   const data = await fetcher(`/vacas/${id}`)
+
+//   const cow = {
+//     id,
+//     name: data.name,
+//     born: moment(data.born).format('YYYY-MM-DD'),
+//     image: data?.image?.url === undefined ? '' : data.image.url,
+//     weight: data.weights.sort((a, b) => (a.id > b.id) ? -1 : 1)?.[0],
+
+//   }
+
+//   return {
+//     props: {
+//       cow,
+//     },
+//   }
+// }
