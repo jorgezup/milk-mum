@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import React from 'react'
@@ -34,9 +34,25 @@ type ICow = {
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
 export default function AnimalList(props) {
-  const { data } = useSWR('vacas', fetcher, { initialData: props.cows })
+  const { data: cows, error, isValidating } = useSWR('/vacas', fetcher, { initialData: props.cows })
 
-  if (!data) {
+  if (isValidating) {
+    return (
+      <div style={{ flex: 1 }}>
+        <p>Validating</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{ flex: 1 }}>
+        <p>Erro ao carregar os dados</p>
+      </div>
+    )
+  }
+
+  if (!cows) {
     return (
       <div style={{ flex: 1 }}>
         <p>Carregando...</p>
@@ -70,7 +86,7 @@ export default function AnimalList(props) {
             </tr>
           </thead>
           <tbody>
-            {data.map((cow: ICow) => (
+            {cows.map((cow: ICow) => (
               <Link
                 key={cow?.id}
                 href={`visualizar-animal/${cow.id}`}
@@ -113,22 +129,23 @@ export default function AnimalList(props) {
   )
 }
 
-// export const getStaticProps = async () => {
+export const getStaticProps:GetStaticProps = async () => {
+  const cows: ICow[] = await fetcher(`/vacas`)
+
+  return {
+    props: {
+      cows
+    },
+    revalidate: 60
+  }
+}
+
+// export const getServerSideProps: GetServerSideProps = async() => {
 //   const cows: ICow[] = await fetcher(`/vacas`)
 
-//   return {
+//   return { 
 //     props: {
 //       cows
 //     }
 //   }
 // }
-
-export const getServerSideProps: GetServerSideProps = async() => {
-  const cows: ICow[] = await fetcher(`/vacas`)
-
-  return { 
-    props: {
-      cows
-    }
-  }
-}
