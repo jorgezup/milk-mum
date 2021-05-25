@@ -6,6 +6,9 @@
   color: var(--white);
   height: 3rem;
 
+  display: flex;
+  align-items: center;
+
   &:hover {
     filter: brightness(.82);
   }
