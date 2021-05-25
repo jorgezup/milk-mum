@@ -3,6 +3,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import React from 'react'
 import { GiCow } from 'react-icons/gi'
+import useSWR from 'swr'
 import { api } from '../../services/api'
 import styles from './styles.module.scss'
 
@@ -31,8 +32,10 @@ type ICow = {
 
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalList({cows}) {
-  if (!cows) {
+export default function AnimalList(props) {
+  const { data } = useSWR('vacas', fetcher, { initialData: props.cows })
+
+  if (!data) {
     return (
       <div style={{ flex: 1 }}>
         <p>Carregando...</p>
@@ -66,7 +69,7 @@ export default function AnimalList({cows}) {
             </tr>
           </thead>
           <tbody>
-            {cows.map((cow: ICow) => (
+            {data.map((cow: ICow) => (
               <Link
                 key={cow?.id}
                 href={`visualizar-animal/${cow.id}`}

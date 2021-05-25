@@ -51,7 +51,7 @@ export default function AnimalRegister() {
         await api.post('pesos', dataWeight)
 
         toast.success('Cadastrado com sucesso')
-        router.push('/listar-animais')
+        router.push(`/visualizar-animal/${response.data.id}`)
 
         if (selectedFile) {
           const imageResponse = await api.put(`/vacas/${response.data.id}`, {

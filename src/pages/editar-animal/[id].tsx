@@ -7,7 +7,7 @@ import Image from 'next/image';
 import router from 'next/router';
 import React, { useState } from "react";
 import { toast } from 'react-toastify';
-import { mutate } from 'swr';
+import useSWR, { mutate } from 'swr';
 import * as Yup from 'yup';
 import { BackButton } from '../../components/BackButton';
 import { InputFile } from '../../components/InputFile';
@@ -64,10 +64,10 @@ const AnimalSchema = Yup.object().shape({
 
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalEdit({ cow }) {
+export default function AnimalEdit(props) {
+  const { data: cow } = useSWR(`vacas/${props.cow.id}`, fetcher, { initialData: props.cow })
+
   const [selectedFile, setSelectedFile] = useState(null)
-
-
 
   if (!cow) {
     return (
@@ -96,7 +96,6 @@ export default function AnimalEdit({ cow }) {
 
     return uploadRes.data[0]
   }
-
 
   async function onSubmit(values, actions) {
     try {

@@ -3,11 +3,11 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 import Image from 'next/image';
 import Link from "next/link";
-import { useRouter } from 'next/router';
 import React, { useState } from "react";
 import { FaEdit, FaGenderless, FaWeight } from 'react-icons/fa';
 import { GiCow, GiMilkCarton } from 'react-icons/gi';
 import { TiWarning } from "react-icons/ti";
+import useSWR from "swr";
 import { BackButton } from "../../components/BackButton";
 import TableCalf from "../../components/TableCalf";
 import TableCoverage from "../../components/TableCoverage";
@@ -60,10 +60,10 @@ interface CowProps {
 
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalDetails({ cow }: CowProps) {
-  const { isFallback } = useRouter()
+export default function AnimalDetails(props) {
+  const { data: cow } = useSWR(`vacas/${props.cow.id}`, fetcher, { initialData: props.cow })
 
-  if (isFallback) {
+  if (!cow) {
     return (
       <div style={{ flex: 1 }}>
         <p>Carregando...</p>
