@@ -4,7 +4,6 @@ import Link from 'next/link'
 import React from 'react'
 import { GiCow } from 'react-icons/gi'
 import { api } from '../../services/api'
-import startBackend from '../../utils/startBackend'
 import styles from './styles.module.scss'
 
 type IWeight = {
@@ -33,8 +32,6 @@ type ICow = {
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
 export default function AnimalList({cows}) {
-  startBackend() 
-  
   if (!cows) {
     return (
       <div style={{ flex: 1 }}>

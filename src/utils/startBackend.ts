@@ -1,9 +1,10 @@
 import { useEffect } from "react"
+import { api } from "../services/api"
 
 const startBackend = () => {
   useEffect(() => {
-    fetch(process.env.NEXT_PUBLIC_API_URL)
-  }, [])
+    api.get('vacas')
+  })
 }
 
 export default startBackend
