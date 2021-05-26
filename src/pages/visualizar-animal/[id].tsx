@@ -62,7 +62,7 @@ interface CowProps {
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
 export default function AnimalDetails(props) {
-  const { data: cow } = useSWR(`/vacas/${props.cow.id}`, fetcher)
+  const { data: cow } = useSWR(`/vacas/${props.cow.id}`, fetcher, { initialData: props.cow })
   const router = useRouter()
 
   if (router.isFallback) {
