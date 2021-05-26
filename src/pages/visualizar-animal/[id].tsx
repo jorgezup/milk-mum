@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import { FaEdit, FaGenderless, FaWeight } from 'react-icons/fa';
 import { GiCow, GiMilkCarton } from 'react-icons/gi';
 import { TiWarning } from "react-icons/ti";
+import useSWR from "swr";
 import { BackButton } from "../../components/BackButton";
 import TableCalf from "../../components/TableCalf";
 import TableCoverage from "../../components/TableCoverage";
@@ -59,8 +60,24 @@ interface CowProps {
 
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalDetails({cow}) {
-  // const { data: cow } = useSWR(`vacas/${props.cow.id}`, fetcher, { initialData: props.cow })
+export default function AnimalDetails(props) {
+  const { data: cow, error, isValidating } = useSWR(`/vacas/${props.cow.id}`, fetcher, { initialData: props.cow })
+
+  if (isValidating) {
+    return (
+      <div style={{ flex: 1 }}>
+        <p>Validating</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{ flex: 1 }}>
+        <p>Erro ao carregar os dados</p>
+      </div>
+    )
+  }
 
   if (!cow) {
     return (
@@ -427,6 +444,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       cow
-    }
+    },
+    revalidate: 30
   }
 }
