@@ -3,11 +3,11 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 import Image from 'next/image';
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { FaEdit, FaGenderless, FaWeight } from 'react-icons/fa';
 import { GiCow, GiMilkCarton } from 'react-icons/gi';
 import { TiWarning } from "react-icons/ti";
-import useSWR from "swr";
 import { BackButton } from "../../components/BackButton";
 import TableCalf from "../../components/TableCalf";
 import TableCoverage from "../../components/TableCoverage";
@@ -60,26 +60,10 @@ interface CowProps {
 
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalDetails(props) {
-  const { data: cow, error, isValidating } = useSWR(`/vacas/${props.cow.id}`, fetcher, { initialData: props.cow })
+export default function AnimalDetails({cow}) {
+  const router = useRouter()
 
-  if (isValidating) {
-    return (
-      <div style={{ flex: 1 }}>
-        <p>Validating</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div style={{ flex: 1 }}>
-        <p>Erro ao carregar os dados</p>
-      </div>
-    )
-  }
-
-  if (!cow) {
+  if (router.isFallback) {
     return (
       <div style={{ flex: 1 }}>
         <p>Carregando...</p>
@@ -399,14 +383,14 @@ export default function AnimalDetails(props) {
 // }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // const cows = await fetcher(`/vacas`)
+  const cows = await fetcher(`/vacas`)
 
-  // const paths = cows.map((cow: ICow) => ({
-  //   params: { id: cow.id.toString() }
-  // }))
+  const paths = cows.map((cow: ICow) => ({
+    params: { id: cow.id.toString() }
+  }))
 
   return { 
-    paths: [], 
+    paths, 
     fallback: 'blocking' 
   }
 }
