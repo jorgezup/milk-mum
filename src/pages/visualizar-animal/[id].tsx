@@ -65,7 +65,7 @@ export default function AnimalDetails(props) {
   const { data } = useSWR(`/vacas/${props.cow.id}`, fetcher, { initialData: props.cow })
   
   const cow = data
-  
+
   const router = useRouter()
 
   if (router.isFallback) {
@@ -396,7 +396,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   return { 
     paths, 
-    fallback: true 
+    fallback: false 
   }
 }
 
