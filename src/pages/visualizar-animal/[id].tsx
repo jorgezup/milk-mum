@@ -393,7 +393,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   return { 
     paths, 
-    fallback: false 
+    fallback: true 
   }
 }
 
@@ -430,5 +430,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     props: {
       cow
     },
+    revalidate: 10
   }
 }
