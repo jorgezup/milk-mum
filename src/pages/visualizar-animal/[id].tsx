@@ -61,8 +61,8 @@ interface CowProps {
 
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalDetails({cow}) {
-  useSWR(`/vacas/${cow.id}`, fetcher)
+export default function AnimalDetails(props) {
+  const { data: cow } = useSWR(`/vacas/${props.cow.id}`, fetcher)
   const router = useRouter()
 
   if (router.isFallback) {
@@ -402,8 +402,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   
   const data = await fetcher(`/vacas/${id}`)
 
-
-
   async function getCoverages(coverages: CowCoveragesProps[]) {
     const arrayOfPromisses = coverages.map(async (cowCoverage: CowCoveragesProps) => {
       const response = await api.get(`coberturas/${cowCoverage.id}`)
@@ -432,6 +430,5 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     props: {
       cow
     },
-    revalidate: 10
   }
 }
