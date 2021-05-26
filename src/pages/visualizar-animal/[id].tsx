@@ -62,11 +62,35 @@ interface CowProps {
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
 export default function AnimalDetails(props) {
-  const { data } = useSWR(`/vacas/${props.cow.id}`, fetcher, { initialData: props.cow })
+  const { data, error, isValidating } = useSWR(`/vacas/${props.cow.id}`, fetcher, { initialData: props.cow })
   
   const cow = data
 
   const router = useRouter()
+
+  if (isValidating) {
+    return (
+      <div style={{ flex: 1 }}>
+        <p>Validating</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div style={{ flex: 1 }}>
+        <p>Erro ao carregar os dados</p>
+      </div>
+    )
+  }
+
+  if (!cow) {
+    return (
+      <div style={{ flex: 1 }}>
+        <p>Carregando...</p>
+      </div>
+    )
+  }
 
   if (router.isFallback) {
     return (
