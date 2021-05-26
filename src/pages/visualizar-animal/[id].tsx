@@ -62,7 +62,7 @@ interface CowProps {
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
 export default function AnimalDetails({cow}) {
-  useSWR(`/vacas/${cow.id}`, fetcher, { refreshInterval: 1000} )
+  useSWR(`/vacas/${cow.id}`, fetcher)
   const router = useRouter()
 
   if (router.isFallback) {
@@ -427,8 +427,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       }
     })
   }
-
-  console.log(cow)
 
   return {
     props: {
