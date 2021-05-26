@@ -130,13 +130,21 @@ export default function AnimalList(props) {
 }
 
 export const getStaticProps:GetStaticProps = async () => {
-  const cows: ICow[] = await fetcher(`/vacas`)
+  const data: ICow[] = await fetcher(`/vacas`)
+
+  const cows = data.map((cow: ICow) => {
+    return {
+      ...cow,
+      weights: cow?.weights?.sort((a:IWeight, b:IWeight) => (a.id > b.id) ? -1 : 1),
+      milkings: cow?.milkings?.sort((a:IMilking, b:IMilking) => (a.id > b.id) ? -1 : 1),
+    }
+  })
 
   return {
     props: {
       cows
     },
-    revalidate: 60
+    revalidate: 1
   }
 }
 
