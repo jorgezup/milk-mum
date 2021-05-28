@@ -8,7 +8,6 @@ import React, { useState } from "react";
 import { FaEdit, FaGenderless, FaWeight } from 'react-icons/fa';
 import { GiCow, GiMilkCarton } from 'react-icons/gi';
 import { TiWarning } from "react-icons/ti";
-import useSWR from "swr";
 import { BackButton } from "../../components/BackButton";
 import TableCalf from "../../components/TableCalf";
 import TableCoverage from "../../components/TableCoverage";
@@ -61,28 +60,28 @@ interface CowProps {
 
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalDetails(props) {
-  const { data, error, isValidating } = useSWR(`/vacas/${props.cow.id}`, fetcher, { initialData: props.cow })
+export default function AnimalDetails({cow}) {
+  // const { data, error, isValidating } = useSWR(`/vacas/${props.cow.id}`, fetcher, { initialData: props.cow })
   
-  const cow = data
+  // const cow = data
 
   const router = useRouter()
 
-  if (isValidating) {
-    return (
-      <div style={{ flex: 1 }}>
-        <p>Validating</p>
-      </div>
-    )
-  }
+  // if (isValidating) {
+  //   return (
+  //     <div style={{ flex: 1 }}>
+  //       <p>Validating</p>
+  //     </div>
+  //   )
+  // }
 
-  if (error) {
-    return (
-      <div style={{ flex: 1 }}>
-        <p>Erro ao carregar os dados</p>
-      </div>
-    )
-  }
+  // if (error) {
+  //   return (
+  //     <div style={{ flex: 1 }}>
+  //       <p>Erro ao carregar os dados</p>
+  //     </div>
+  //   )
+  // }
 
   if (!cow) {
     return (
@@ -427,7 +426,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { id } = params
   
-  const data = await fetcher(`/vacas/${id}`)
+  // const data = await fetcher(`/vacas/${id}`)
+  const {data} = await api.get(`/vacas/${id}`)
 
   async function getCoverages(coverages: CowCoveragesProps[]) {
     const arrayOfPromisses = coverages.map(async (cowCoverage: CowCoveragesProps) => {

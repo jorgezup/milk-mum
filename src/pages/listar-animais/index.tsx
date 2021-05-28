@@ -2,9 +2,9 @@ import moment from 'moment'
 import { GetStaticProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import React from 'react'
 import { GiCow } from 'react-icons/gi'
-import useSWR from 'swr'
 import { api } from '../../services/api'
 import styles from './styles.module.scss'
 
@@ -33,23 +33,33 @@ type ICow = {
 
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalList(props) {
-  const { data, error, isValidating } = useSWR('/vacas', fetcher, { initialData: props.cows })
+export default function AnimalList({cows}) {
+  // const { data, error, isValidating } = useSWR('/vacas', fetcher, { initialData: props.cows })
 
-  const cows = data
+  // const cows = data
 
-  if (isValidating) {
+  // if (isValidating) {
+  //   return (
+  //     <div style={{ flex: 1 }}>
+  //       <p>Validating</p>
+  //     </div>
+  //   )
+  // }
+
+  // if (error) {
+  //   return (
+  //     <div style={{ flex: 1 }}>
+  //       <p>Erro ao carregar os dados</p>
+  //     </div>
+  //   )
+  // }
+
+  const router = useRouter()
+
+  if (router.isFallback) {
     return (
       <div style={{ flex: 1 }}>
-        <p>Validating</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div style={{ flex: 1 }}>
-        <p>Erro ao carregar os dados</p>
+        <p>Carregando...</p>
       </div>
     )
   }
@@ -132,7 +142,8 @@ export default function AnimalList(props) {
 }
 
 export const getStaticProps:GetStaticProps = async () => {
-  const data: ICow[] = await fetcher(`/vacas`)
+  // const data: ICow[] = await fetcher(`/vacas`)
+  const {data} = await api.get(`/vacas`)
 
   const cows = data.map((cow: ICow) => {
     return {
@@ -146,7 +157,6 @@ export const getStaticProps:GetStaticProps = async () => {
     props: {
       cows
     },
-    revalidate: 1
   }
 }
 
