@@ -4,10 +4,10 @@ import moment from 'moment';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
-import router from 'next/router';
+import { useRouter } from 'next/router';
 import React, { useState } from "react";
 import { toast } from 'react-toastify';
-import useSWR, { mutate } from 'swr';
+import { mutate } from 'swr';
 import * as Yup from 'yup';
 import { BackButton } from '../../components/BackButton';
 import { InputFile } from '../../components/InputFile';
@@ -64,26 +64,37 @@ const AnimalSchema = Yup.object().shape({
 
 const fetcher = (url: string) => api.get(url).then(res => res.data)
 
-export default function AnimalEdit(props) {
-  const { data: cow, error, isValidating } = useSWR(`/vacas/${props.cow.id}`, fetcher, { initialData: props.cows })
+export default function AnimalEdit({cow}) {
+  // const { data: cow, error, isValidating } = useSWR(`/vacas/${props.cow.id}`, fetcher, { initialData: props.cows })
 
   const [selectedFile, setSelectedFile] = useState(null)
 
-  if (isValidating) {
+  // if (isValidating) {
+  //   return (
+  //     <div style={{ flex: 1 }}>
+  //       <p>Validating</p>
+  //     </div>
+  //   )
+  // }
+
+  // if (error) {
+  //   return (
+  //     <div style={{ flex: 1 }}>
+  //       <p>Erro ao carregar os dados</p>
+  //     </div>
+  //   )
+  // }
+
+  const router = useRouter()
+
+  if (router.isFallback) {
     return (
       <div style={{ flex: 1 }}>
-        <p>Validating</p>
+        <p>Carregando...</p>
       </div>
     )
   }
 
-  if (error) {
-    return (
-      <div style={{ flex: 1 }}>
-        <p>Erro ao carregar os dados</p>
-      </div>
-    )
-  }
 
   if (!cow) {
     return (
@@ -257,7 +268,8 @@ export default function AnimalEdit(props) {
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const { id } = params
 
-  const data = await fetcher(`/vacas/${id}`)
+  // const data = await fetcher(`/vacas/${id}`)
+  const {data} = await api.get(`/vacas/${id}`)
 
   const cow = {
     id,
