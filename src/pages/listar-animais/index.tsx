@@ -157,6 +157,7 @@ export const getStaticProps:GetStaticProps = async () => {
     props: {
       cows
     },
+    revalidate: 1
   }
 }
 

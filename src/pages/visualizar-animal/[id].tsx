@@ -456,6 +456,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       cow
-    }
+    },
+    revalidate: 1
   }
 }
